@@ -1,36 +1,34 @@
 <?php
 
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\InaprocAccountController; // Pastikan ini di-import
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\InaprocAccountController;
 
-/** 
-Route::prefix('inaproc-accounts')->group(function () {
-    
-    // Halaman Utama (Daftar Akun)
-    Route::get('/', [InaprocAccountController::class, 'index'])->name('inaproc-accounts.index');
-    
-    // Resource Route untuk Create, Edit, Delete, dll
-    Route::resource('accounts', InaprocAccountController::class)->names([
-        'index'   => 'inaproc-accounts.index',
-        'create'  => 'inaproc-accounts.create',
-        'store'   => 'inaproc-accounts.store',
-        'show'    => 'inaproc-accounts.show',
-        'edit'    => 'inaproc-accounts.edit',
-        'update'  => 'inaproc-accounts.update',
-        'destroy' => 'inaproc-accounts.destroy',
-    ]);
-
-    // Export Routes
-    Route::get('/export/pdf', [InaprocAccountController::class, 'exportPdf'])->name('inaproc.export-pdf');
+// 1. REDIRECT HALAMAN DEPAN
+// Jika user belum login, Breeze otomatis arahkan ke /login (dari middleware auth)
+Route::get('/', function () {
+    return redirect()->route('inaproc-accounts.index');
 });
-**/
 
-// Halaman Utama (Sekarang langsung di root /)
-Route::get('/', [InaprocAccountController::class, 'index'])->name('inaproc-accounts.index');
+// 2. SEMUA ROUTE YANG WAJIB LOGIN
+Route::middleware(['auth', 'verified'])->group(function () {
+    
+    // Dashboard (Bawaan Breeze, bisa tetap ada atau dihapus)
+    Route::get('/dashboard', function () {
+        return view('dashboard');
+    })->name('dashboard');
 
-Route::resource('accounts', InaprocAccountController::class)
-    ->parameters(['accounts' => 'inaprocAccount'])
-    ->names('inaproc-accounts');
+    // --- ROUTE UTAMA INAPROC ---
+    Route::resource('accounts', InaprocAccountController::class)
+        ->parameters(['accounts' => 'inaprocAccount'])
+        ->names('inaproc-accounts');
 
-// Export Routes
-Route::get('/export/pdf', [InaprocAccountController::class, 'exportPdf'])->name('inaproc.export-pdf');
+    Route::get('/export/pdf', [InaprocAccountController::class, 'exportPdf'])->name('inaproc.export-pdf');
+
+    // --- ROUTE PROFILE USER (Breeze) ---
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+require __DIR__.'/auth.php';
