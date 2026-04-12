@@ -7,7 +7,7 @@
         <div class="flex items-center space-x-4">
             <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Coat_of_arms_of_West_Nusa_Tenggara.svg/500px-Coat_of_arms_of_West_Nusa_Tenggara.svg.png" class="h-14 w-auto" alt="Logo">
             <div>
-                <h1 class="text-2xl font-black text-blue-800 uppercase tracking-tight">Akun Inaproc Storage</h1>
+                <h1 class="text-2xl font-black text-blue-800 uppercase tracking-tight">Manajemen Akun Inaproc</h1>
                 <p class="text-xs text-gray-400 font-bold uppercase tracking-widest">Provinsi Nusa Tenggara Barat</p>
             </div>
         </div>
