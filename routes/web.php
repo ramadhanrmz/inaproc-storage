@@ -4,15 +4,6 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\InaprocAccountController;
 
 /** 
-Route::get('/', function () {
-    return redirect('/inaproc-accounts');
-});
-
-Route::resource('/', InaprocAccountController::class)->names('inaproc-accounts');
-#Route::resource('inaproc-accounts', InaprocAccountController::class);
-Route::get('inaproc-export-pdf', [InaprocAccountController::class, 'exportPdf'])->name('inaproc.export-pdf');
-*/
-
 Route::prefix('inaproc-accounts')->group(function () {
     
     // Halaman Utama (Daftar Akun)
@@ -32,3 +23,14 @@ Route::prefix('inaproc-accounts')->group(function () {
     // Export Routes
     Route::get('/export/pdf', [InaprocAccountController::class, 'exportPdf'])->name('inaproc.export-pdf');
 });
+**/
+
+// Halaman Utama (Sekarang langsung di root /)
+Route::get('/', [InaprocAccountController::class, 'index'])->name('inaproc-accounts.index');
+
+Route::resource('accounts', InaprocAccountController::class)
+    ->parameters(['accounts' => 'inaprocAccount'])
+    ->names('inaproc-accounts');
+
+// Export Routes
+Route::get('/export/pdf', [InaprocAccountController::class, 'exportPdf'])->name('inaproc.export-pdf');
