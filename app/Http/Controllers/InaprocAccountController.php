@@ -5,69 +5,86 @@ namespace App\Http\Controllers;
 use App\Models\InaprocAccount;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 
 class InaprocAccountController extends Controller
 {
     public function index(Request $request)
     {
-        // Mengambil filter dari request
+        // 1. Ambil semua filter dari request
         $search = $request->get('search');
         $statusFilter = $request->get('status_filter');
         $bulan = $request->get('bulan');
         $tahun = $request->get('tahun');
-        $perPage = $request->get('per_page', 10); // Default 10
+        $jenisFilter = $request->get('jenis_filter');
+        $perPage = $request->get('per_page', 10);
 
-        // Query dasar
+        // 2. Query untuk Tabel (Data Utama)
         $query = InaprocAccount::query();
 
-        // Logika Filter
         if ($search) {
-            $query->where('nama', 'like', "%{$search}%")
+            $query->where(function($q) use ($search) {
+                $q->where('nama', 'like', "%{$search}%")
                 ->orWhere('user_id', 'like', "%{$search}%")
                 ->orWhere('opd', 'like', "%{$search}%");
+            });
         }
 
         if ($statusFilter && $statusFilter != 'Semua Tipe') {
             $query->where('status', $statusFilter);
         }
 
-        if ($bulan) {
-            $query->whereMonth('created_at', $bulan);
+        if ($bulan) $query->whereMonth('tanggal_daftar', $bulan);
+        if ($tahun) $query->whereYear('tanggal_daftar', $tahun);
+        if ($jenisFilter) $query->where('jenis_data', $jenisFilter);
+
+
+        // 3. LOGIKA STATISTIK (Cards) - Sekarang dibuat sangat sensitif terhadap semua filter
+        $baseDetail = InaprocAccount::query();
+
+        // Filter Waktu
+        if ($bulan) $baseDetail->whereMonth('tanggal_daftar', $bulan);
+        if ($tahun) $baseDetail->whereYear('tanggal_daftar', $tahun);
+
+        // FILTER BARU: Masukkan filter status ke baseDetail agar angka detail ikut nol jika tidak sesuai
+        if ($statusFilter && $statusFilter != 'Semua Tipe') {
+            $baseDetail->where('status', $statusFilter);
         }
 
-        if ($tahun) {
-            $query->whereYear('created_at', $tahun);
-        }
+        // Filter Jenis Data (Jika ada)
+        if ($jenisFilter) $baseDetail->where('jenis_data', $jenisFilter);
 
-        $jenisFilter = $request->get('jenis_filter');
-        if ($jenisFilter) {
-            $query->where('jenis_data', $jenisFilter);
-        }
-
-        // Hitung Statistik untuk Cards
         $stats = [
-            'total' => InaprocAccount::count(),
-            // Katalog v.6
-            'katalog_ppk' => InaprocAccount::where('jenis_data', 'Katalog v.6')->where('status', 'PPK')->count(),
-            'katalog_pp' => InaprocAccount::where('jenis_data', 'Katalog v.6')->where('status', 'PP')->count(),
-            'katalog_bendahara' => InaprocAccount::where('jenis_data', 'Katalog v.6')->where('status', 'Bendahara')->count(),
-            // SPSE
-            'spse_ppk' => InaprocAccount::where('jenis_data', 'SPSE')->where('status', 'PPK')->count(),
-            'spse_pp' => InaprocAccount::where('jenis_data', 'SPSE')->where('status', 'PP')->count(),
-            'spse_pokja' => InaprocAccount::where('jenis_data', 'SPSE')->where('status', 'POKJA')->count(),
-            'spse_lainnya' => InaprocAccount::where('jenis_data', 'SPSE')->whereIn('status', ['PA', 'KPA', 'Auditor'])->count(),
+            // Total utama (Sama dengan baseDetail karena filternya sudah lengkap)
+            'total' => (clone $baseDetail)->count(),
+            
+            // Statistik Katalog (Otomatis jadi 0 kalau statusFilter-nya bukan PPK/PP/BDH)
+            'katalog_ppk' => (clone $baseDetail)->where('jenis_data', 'Katalog v.6')->where('status', 'PPK')->count(),
+            'katalog_pp' => (clone $baseDetail)->where('jenis_data', 'Katalog v.6')->where('status', 'PP')->count(),
+            'katalog_bendahara' => (clone $baseDetail)->where('jenis_data', 'Katalog v.6')->where('status', 'Bendahara')->count(),
+            
+            // Statistik SPSE (Otomatis jadi 0 kalau statusFilter-nya bukan PPK/PP/PKJ/KPA)
+            'spse_ppk' => (clone $baseDetail)->where('jenis_data', 'SPSE')->where('status', 'PPK')->count(),
+            'spse_pp' => (clone $baseDetail)->where('jenis_data', 'SPSE')->where('status', 'PP')->count(),
+            'spse_pokja' => (clone $baseDetail)->where('jenis_data', 'SPSE')->where('status', 'POKJA')->count(),
+            'spse_lainnya' => (clone $baseDetail)->where('jenis_data', 'SPSE')->whereIn('status', ['PA', 'KPA', 'Auditor'])->count(),
         ];
 
-        $accounts = ($perPage == 'semua') ? $query->latest()->get() : $query->latest()->paginate($perPage)->withQueryString();
+        // 4. Eksekusi Query Tabel
+        $accounts = ($perPage == 'semua') 
+            ? $query->orderBy('tanggal_daftar', 'desc')->get() 
+            : $query->orderBy('tanggal_daftar', 'desc')->paginate($perPage)->withQueryString();
 
         return view('inaproc.index', compact('accounts', 'stats'));
     }
 
+    // Menampilkan halaman form tambah data
     public function create()
     {
         return view('inaproc.create');
     }
 
+    // Memproses data yang dikirim dari form tambah ke database
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -86,6 +103,7 @@ class InaprocAccountController extends Controller
             'alamat' => 'required',
             'sumber' => 'required',
             'jenis_data' => 'required|in:Katalog v.6,SPSE',
+            'tanggal_daftar' => 'required|date',
         ]);
 
         InaprocAccount::create($validated);
@@ -177,5 +195,93 @@ class InaprocAccountController extends Controller
                 ->setPaper('a4', 'portrait');
 
         return $pdf->stream("Rekapitulasi_{$jenis}.pdf");
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'csv_file' => 'required|mimes:csv,txt',
+        ]);
+
+        $file = $request->file('csv_file');
+        $handle = fopen($file->getRealPath(), "r");
+        
+        fgetcsv($handle); 
+
+        $count = 0;
+        while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
+            
+            // --- LOGIKA KONVERSI TANGGAL MAS ROBI ---
+            $tanggalDaftar = null;
+            if (!empty($data[15])) {
+                try {
+                    // Mengubah format 13/01/2026 menjadi format database 2026-01-13
+                    $tanggalDaftar = Carbon::createFromFormat('d/m/Y', trim($data[15]))->format('Y-m-d');
+                } catch (\Exception $e) {
+                    // Jika formatnya aneh/salah, pakai tanggal hari ini
+                    $tanggalDaftar = date('Y-m-d');
+                }
+            } else {
+                $tanggalDaftar = date('Y-m-d');
+            }
+            // ----------------------------------------
+
+            InaprocAccount::create([
+                'nama'               => $data[0],
+                'opd'                => $data[1],
+                'status'             => $data[2],
+                'no_surat_permohonan'=> $data[3],
+                'perihal_permohonan' => $data[4],
+                'no_sk'              => $data[5],
+                'user_id'            => $data[6],
+                'nik'                => $data[7],
+                'nip'                => $data[8],
+                'pangkat_gol'        => $data[9],
+                'jabatan'            => $data[10],
+                'no_hp'              => $data[11],
+                'alamat'             => $data[12],
+                'sumber'             => $data[13] ?? 'Digital',
+                'jenis_data'         => $data[14] ?? 'Katalog v.6',
+                'tanggal_daftar'     => $tanggalDaftar, // Pakai variabel yang sudah dikonversi
+            ]);
+            $count++;
+        }
+
+        fclose($handle);
+        return back()->with('success', "Berhasil mengimport $count data Inaproc!");
+    }
+
+    public function downloadTemplate()
+    {
+        $headers = [
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=template_akun_inaproc.csv",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        ];
+
+        // Kolom sesuai urutan database Mas Robi
+        $columns = [
+            'nama', 'opd', 'status', 'no_surat_permohonan', 'perihal_permohonan', 
+            'no_sk', 'user_id', 'nik', 'nip', 'pangkat_gol', 'jabatan', 
+            'no_hp', 'alamat', 'sumber', 'jenis_data', 'tanggal_daftar'
+        ];
+
+        $callback = function() use($columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+
+            // Berikan satu contoh data dummy agar Mas Robi tidak bingung cara isinya
+            fputcsv($file, [
+                'Nama Lengkap Contoh', 'Biro Pengadaan', 'PPK', '001/SRT/2026', 'Permohonan Akun', 
+                '821.29/123/2026', 'USERID_CONTOH', '520123456789', '19930304202301', 'Penata - III/c', 'Pranata Komputer', 
+                '08123456789', 'Jl. Pejanggik No. 1', 'Digital', 'Katalog v.6', '2026-04-12'
+            ]);
+            
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 }

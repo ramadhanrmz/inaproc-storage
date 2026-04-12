@@ -29,6 +29,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::post('/inaproc/import', [InaprocAccountController::class, 'import'])->name('inaproc.import');
+    Route::get('/inaproc/download-template', [InaprocAccountController::class, 'downloadTemplate'])->name('inaproc.download-template');
 });
 
 require __DIR__.'/auth.php';

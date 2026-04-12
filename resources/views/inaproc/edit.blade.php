@@ -82,6 +82,16 @@
                 <label class="block text-gray-700 font-bold mb-1">No WhatsApp <span class="text-red-500">*</span></label>
                 <input type="number" name="no_hp" value="{{ old('no_hp', $inaprocAccount->no_hp) }}" oninput="if(this.value.length > 12) this.value = this.value.slice(0, 12);" class="w-full border rounded px-3 py-2" required>
             </div>
+            <div class="mt-4">
+                <x-input-label for="tanggal_daftar" :value="__('Tanggal Pengaktifan Akun')" />
+                <x-text-input id="tanggal_daftar" class="block mt-1 w-full" 
+                            type="date" 
+                            name="tanggal_daftar" 
+                            {{-- Michelle tambahkan pengecekan data dari database di sini --}}
+                            :value="old('tanggal_daftar', $inaprocAccount->tanggal_daftar)" 
+                            required />
+                <x-input-error :messages="$errors->get('tanggal_daftar')" class="mt-2" />
+            </div>
             <div>
                 <label class="block text-gray-700 font-bold mb-1">Jenis Data <span class="text-red-500">*</span></label>
                 <div class="mt-2 space-x-6 text-sm font-semibold">

@@ -96,18 +96,17 @@
     </div>
 
     {{-- FILTER SECTION --}}
-    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-wrap justify-between items-center gap-4">
+    {{-- Ganti bagian tombol Export PDF di index.blade.php dengan ini --}}
+    <div class="flex items-center gap-2">
+        {{-- Tombol Export PDF --}}
         <div class="relative inline-block group">
             <button type="button" class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg text-xs font-bold flex items-center transition shadow-sm">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                 </svg>
                 Export PDF
-                <svg class="w-3 h-3 ml-2 transition-transform group-hover:rotate-180" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/>
-                </svg>
             </button>
-
+            
             <!-- Dropdown Menu -->
             <div class="absolute left-0 w-48 mt-2 origin-top-left bg-white border border-gray-100 divide-y divide-gray-50 rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[999]">
                 <div class="py-2">
@@ -120,6 +119,27 @@
                 </div>
             </div>
         </div>
+
+        {{-- TOMBOL IMPORT CSV BARU --}}
+        <form action="{{ route('inaproc.import') }}" method="POST" enctype="multipart/form-data" class="flex items-center">
+            @csrf
+            <input type="file" name="csv_file" id="csv_file" class="hidden" onchange="this.form.submit()" accept=".csv">
+            <button type="button" onclick="document.getElementById('csv_file').click()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-xs font-bold flex items-center transition shadow-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                </svg>
+                Import CSV
+            </button>
+        </form>
+
+        {{-- Tombol Download Template --}}
+        <a href="{{ route('inaproc.download-template') }}" class="bg-slate-100 hover:bg-slate-200 text-slate-600 px-4 py-2 rounded-lg text-xs font-bold flex items-center transition border border-slate-200">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            Download Template
+        </a>
+    </div>
 
         <form id="auto-filter-form" action="{{ route('inaproc-accounts.index') }}" method="GET" class="flex flex-wrap items-center gap-3">
             <div class="flex items-center bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-200">
@@ -193,8 +213,8 @@
                 <thead>
                     <tr class="bg-gray-50/50 text-gray-400 uppercase text-[10px] font-black tracking-widest border-b border-gray-100">
                         <th class="p-4 text-center">No</th>
-                        <th class="p-4">User Info</th>
-                        <th class="p-4">OPD</th>
+                        <th class="p-4">Nama Lengkap</th>
+                        <th class="p-4">Satuan Kerja</th>
                         <th class="p-4">Status</th>
                         <th class="p-4">SK & User ID</th>
                         <th class="p-4">Kontak</th>
@@ -209,6 +229,7 @@
                             <div class="flex flex-col">
                                 <span class="font-bold text-gray-700 text-sm">{{ $item->nama }}</span>
                                 <span class="text-[10px] text-blue-500 font-bold italic">{{ $item->jabatan }}</span>
+                                <span class="text-[9px] text-gray-400 mt-1 font-medium">Terdaftar: {{ \Carbon\Carbon::parse($item->tanggal_daftar)->format('d M Y') }}</span>
                             </div>
                         </td>
                         <td class="p-4 text-xs font-bold text-gray-600">{{ $item->opd }}</td>
@@ -226,9 +247,9 @@
                                 $cleanPhone = preg_replace('/[^0-9]/', '', $item->no_hp);
                                 if (str_starts_with($cleanPhone, '0')) $cleanPhone = '62' . substr($cleanPhone, 1);
                             @endphp
-                            <a href="https://wa.me/{{ $cleanPhone }}" target="_blank" class="inline-flex items-center text-xs font-bold text-green-600 hover:text-green-700">
+                            <a href="https://wa.me/62{{ $cleanPhone }}" target="_blank" class="inline-flex items-center text-xs font-bold text-green-600 hover:text-green-700">
                                 <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.246 2.248 3.484 5.232 3.483 8.413-.003 6.557-5.338 11.892-11.893 11.892-1.997-.001-3.951-.5-5.688-1.448l-6.308 1.654zm6.757-4.791c1.512.897 2.997 1.347 4.737 1.348 5.399 0 9.792-4.393 9.795-9.792.001-2.612-1.015-5.068-2.862-6.916-1.847-1.847-4.303-2.861-6.913-2.862-5.397 0-9.791 4.393-9.793 9.792 0 1.832.484 3.623 1.399 5.204l-.934 3.41 3.506-.92zm9.961-6.221c-.303-.151-1.791-.882-2.069-.982-.278-.1-.482-.151-.683.151-.202.302-.782.982-.958 1.183-.176.201-.353.226-.656.076-.303-.151-1.278-.47-2.435-1.503-.9-.801-1.507-1.791-1.684-2.092-.176-.302-.019-.465.132-.615.136-.135.303-.353.454-.529.151-.177.202-.302.303-.504.101-.201.05-.378-.025-.529-.076-.151-.683-1.641-.936-2.25-.246-.593-.497-.513-.683-.523l-.582-.011c-.201 0-.529.075-.806.378-.277.302-1.058 1.033-1.058 2.52s1.083 2.92 1.234 3.121c.151.202 2.132 3.257 5.166 4.566.72.311 1.282.496 1.719.635.723.23 1.381.197 1.9.12.579-.085 1.791-.73 2.044-1.435.252-.706.252-1.31.176-1.435-.076-.126-.278-.202-.582-.353z"/></svg>
-                                {{ $item->no_hp }}
+                                +62{{ $item->no_hp }}
                             </a>
                         </td>
                         <td class="p-4">

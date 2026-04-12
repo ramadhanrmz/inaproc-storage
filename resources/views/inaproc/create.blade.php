@@ -193,6 +193,16 @@
                 <small class="text-gray-500 text-xs">Maksimal 12 angka.</small>
             </div>
 
+            <div class="mt-4">
+                <x-input-label for="tanggal_daftar" :value="__('Tanggal Pengaktifan Akun')" />
+                <x-text-input id="tanggal_daftar" class="block mt-1 w-full" 
+                            type="date" 
+                            name="tanggal_daftar" 
+                            :value="old('tanggal_daftar', isset($account) ? $account->tanggal_daftar : date('Y-m-d'))" 
+                            required />
+                <x-input-error :messages="$errors->get('tanggal_daftar')" class="mt-2" />
+            </div>
+
             <div>
                 <label class="block text-gray-700 font-bold mb-1">Sumber Data <span class="text-danger text-red-500">*</span></label>
                 <div class="mt-2 space-x-6">
