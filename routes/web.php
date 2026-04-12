@@ -7,5 +7,6 @@ Route::get('/', function () {
     return redirect('/inaproc-accounts');
 });
 
-Route::resource('inaproc-accounts', InaprocAccountController::class);
+Route::resource('/', InaprocAccountController::class)->names('inaproc-accounts');
+#Route::resource('inaproc-accounts', InaprocAccountController::class);
 Route::get('inaproc-export-pdf', [InaprocAccountController::class, 'exportPdf'])->name('inaproc.export-pdf');
