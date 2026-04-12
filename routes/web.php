@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\InaprocAccountController;
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect('/inaproc-accounts');
 });
 
 Route::resource('inaproc-accounts', InaprocAccountController::class);
