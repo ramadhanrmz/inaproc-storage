@@ -9,12 +9,12 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
                 <label class="block text-gray-700 font-bold mb-1">Nama Lengkap <span class="text-danger text-red-500">*</span></label>
-                <input type="text" name="nama" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400" placeholder="Contoh: Muhajidin, S.Pd., MM" required>
+                <input type="text" name="nama" value="{{ old('nama') }}" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400 {{ $errors->has('nama') ? 'border-red-400 bg-red-50' : '' }}" placeholder="Contoh: Muhajidin, S.Pd., MM" required>
             </div>
 
             <div>
                 <label class="block text-gray-700 font-bold mb-1">Perangkat Daerah (OPD) <span class="text-danger text-red-500">*</span></label>
-                <input list="list_opd" name="opd" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400" placeholder="Ketik atau pilih OPD..." required>
+                <input list="list_opd" name="opd" value="{{ old('opd') }}" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400 {{ $errors->has('opd') ? 'border-red-400 bg-red-50' : '' }}" placeholder="Ketik atau pilih OPD..." required>
                 <datalist id="list_opd">
                     <option value="Badan Kesatuan Bangsa dan Politik Dalam Negeri">
                     <option value="Badan Kepegawaian Daerah">
@@ -136,58 +136,58 @@
                 <label class="block text-gray-700 font-bold mb-1">Status <span class="text-danger text-red-500">*</span></label>
                 <select name="status" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400" required>
                     @foreach(['PPK', 'PP', 'Bendahara', 'POKJA', 'Auditor', 'PA', 'KPA'] as $st)
-                        <option value="{{ $st }}">{{ $st }}</option>
+                        <option value="{{ $st }}" {{ old('status') == $st ? 'selected' : '' }}>{{ $st }}</option>
                     @endforeach
                 </select>
             </div>
 
             <div>
                 <label class="block text-gray-700 font-bold mb-1">User ID <span class="text-danger text-red-500">*</span></label>
-                <input type="text" name="user_id" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400" placeholder="Contoh: MUHAJIDINPPK" required>
+                <input type="text" name="user_id" value="{{ old('user_id') }}" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400 {{ $errors->has('user_id') ? 'border-red-400 bg-red-50' : '' }}" placeholder="Contoh: MUHAJIDINPPK" required>
             </div>
 
             <div>
                 <label class="block text-gray-700 font-bold mb-1">NIK <span class="text-danger text-red-500">*</span></label>
-                <input type="number" name="nik" oninput="if(this.value.length > 16) this.value = this.value.slice(0, 16);" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400" placeholder="Maksimal 16 angka" required>
+                <input type="number" name="nik" value="{{ old('nik') }}" oninput="if(this.value.length > 16) this.value = this.value.slice(0, 16);" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400 {{ $errors->has('nik') ? 'border-red-400 bg-red-50' : '' }}" placeholder="Maksimal 16 angka" required>
                 <small class="text-gray-400">Maksimal 16 angka.</small>
             </div>
 
             <div>
                 <label class="block text-gray-700 font-bold mb-1">NIP <span class="text-danger text-red-500">*</span></label>
-                <input type="number" name="nip" oninput="if(this.value.length > 18) this.value = this.value.slice(0, 18);" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400" placeholder="Maksimal 18 angka" required>
+                <input type="number" name="nip" value="{{ old('nip') }}" oninput="if(this.value.length > 18) this.value = this.value.slice(0, 18);" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400 {{ $errors->has('nip') ? 'border-red-400 bg-red-50' : '' }}" placeholder="Maksimal 18 angka" required>
                 <small class="text-gray-400">Maksimal 18 angka.</small>
             </div>
 
             <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4 bg-gray-50 p-4 rounded mt-2">
                 <div>
                     <label class="block text-gray-700 font-bold mb-1 text-sm">No. Surat Permohonan <span class="text-red-500">*</span></label>
-                    <input type="text" name="no_surat_permohonan" class="w-full border rounded px-3 py-2 bg-white" required>
+                    <input type="text" name="no_surat_permohonan" value="{{ old('no_surat_permohonan') }}" class="w-full border rounded px-3 py-2 bg-white {{ $errors->has('no_surat_permohonan') ? 'border-red-400 bg-red-50' : '' }}" required>
                 </div>
                 <div>
                     <label class="block text-gray-700 font-bold mb-1 text-sm">Perihal <span class="text-red-500">*</span></label>
                     <select name="perihal_permohonan" class="w-full border rounded px-3 py-2 bg-white font-bold" required>
-                        <option value="Penerbitan Akun">Penerbitan Akun</option>
-                        <option value="Update Akun">Update Akun</option>
+                        <option value="Penerbitan Akun" {{ old('perihal_permohonan') == 'Penerbitan Akun' ? 'selected' : '' }}>Penerbitan Akun</option>
+                        <option value="Update Akun" {{ old('perihal_permohonan') == 'Update Akun' ? 'selected' : '' }}>Update Akun</option>
                     </select>
                 </div>
                 <div>
                     <label class="block text-gray-700 font-bold mb-1 text-sm">Nomor SK <span class="text-red-500">*</span></label>
-                    <input type="text" name="no_sk" class="w-full border rounded px-3 py-2 bg-white" required>
+                    <input type="text" name="no_sk" value="{{ old('no_sk') }}" class="w-full border rounded px-3 py-2 bg-white {{ $errors->has('no_sk') ? 'border-red-400 bg-red-50' : '' }}" required>
                 </div>
             </div>
 
             <div>
                 <label class="block text-gray-700 font-bold mb-1">Pangkat/Gol <span class="text-danger text-red-500">*</span></label>
-                <input type="text" name="pangkat_gol" class="w-full border rounded px-3 py-2" required>
+                <input type="text" name="pangkat_gol" value="{{ old('pangkat_gol') }}" class="w-full border rounded px-3 py-2 {{ $errors->has('pangkat_gol') ? 'border-red-400 bg-red-50' : '' }}" required>
             </div>
             <div>
                 <label class="block text-gray-700 font-bold mb-1">Jabatan <span class="text-danger text-red-500">*</span></label>
-                <input type="text" name="jabatan" class="w-full border rounded px-3 py-2" required>
+                <input type="text" name="jabatan" value="{{ old('jabatan') }}" class="w-full border rounded px-3 py-2 {{ $errors->has('jabatan') ? 'border-red-400 bg-red-50' : '' }}" required>
             </div>
 
             <div>
                 <label class="block text-gray-700 font-bold mb-1">No WhatsApp <span class="text-danger text-red-500">*</span></label>
-                <input type="number" name="no_hp" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400" 
+                <input type="number" name="no_hp" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400 {{ $errors->has('no_hp') ? 'border-red-400 bg-red-50' : '' }}" 
                     oninput="if(this.value.length > 12) this.value = this.value.slice(0, 12);" 
                     required value="{{ old('no_hp') }}" placeholder="Contoh: 087865xxxxxx">
                 <small class="text-gray-500 text-xs">Maksimal 12 angka.</small>
@@ -207,11 +207,11 @@
                 <label class="block text-gray-700 font-bold mb-1">Sumber Data <span class="text-danger text-red-500">*</span></label>
                 <div class="mt-2 space-x-6">
                     <label class="inline-flex items-center">
-                        <input type="radio" name="sumber" value="Fisik" class="form-radio text-blue-600" checked required>
+                        <input type="radio" name="sumber" value="Fisik" class="form-radio text-blue-600" {{ old('sumber', 'Fisik') == 'Fisik' ? 'checked' : '' }} required>
                         <span class="ml-2">Fisik</span>
                     </label>
                     <label class="inline-flex items-center">
-                        <input type="radio" name="sumber" value="Digital" class="form-radio text-blue-600" required>
+                        <input type="radio" name="sumber" value="Digital" class="form-radio text-blue-600" {{ old('sumber') == 'Digital' ? 'checked' : '' }} required>
                         <span class="ml-2">Digital</span>
                     </label>
                 </div>
@@ -221,11 +221,11 @@
                 <label class="block text-gray-700 font-bold mb-1">Jenis Data <span class="text-red-500">*</span></label>
                 <div class="mt-2 space-x-6">
                     <label class="inline-flex items-center">
-                        <input type="radio" name="jenis_data" value="Katalog v.6" class="form-radio text-blue-600" checked required>
+                        <input type="radio" name="jenis_data" value="Katalog v.6" class="form-radio text-blue-600" {{ old('jenis_data', 'Katalog v.6') == 'Katalog v.6' ? 'checked' : '' }} required>
                         <span class="ml-2">Katalog v.6</span>
                     </label>
                     <label class="inline-flex items-center">
-                        <input type="radio" name="jenis_data" value="SPSE" class="form-radio text-blue-600" required>
+                        <input type="radio" name="jenis_data" value="SPSE" class="form-radio text-blue-600" {{ old('jenis_data') == 'SPSE' ? 'checked' : '' }} required>
                         <span class="ml-2">SPSE</span>
                     </label>
                 </div>
@@ -233,7 +233,7 @@
 
             <div class="md:col-span-2">
                 <label class="block text-gray-700 font-bold mb-1">Alamat <span class="text-danger text-red-500">*</span></label>
-                <textarea name="alamat" rows="3" class="w-full border rounded px-3 py-2" required></textarea>
+                <textarea name="alamat" rows="3" class="w-full border rounded px-3 py-2 {{ $errors->has('alamat') ? 'border-red-400 bg-red-50' : '' }}" required>{{ old('alamat') }}</textarea>
             </div>
         </div>
 
@@ -243,4 +243,59 @@
         </div>
     </form>
 </div>
+
+{{-- MODAL NOTIFIKASI ERROR VALIDASI --}}
+@if($errors->any())
+<div id="error-modal-overlay" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[9999] flex items-center justify-center transition-opacity duration-300">
+    <div id="error-modal" class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4 text-center transform scale-95 opacity-0 transition-all duration-300">
+        {{-- Icon Error --}}
+        <div class="mx-auto w-20 h-20 rounded-full bg-red-100 flex items-center justify-center mb-5">
+            <svg class="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+        </div>
+        <h3 class="text-xl font-black text-gray-800 mb-2">Gagal Menyimpan!</h3>
+        <p class="text-sm text-gray-500 mb-4">Mohon periksa kembali isian berikut:</p>
+        
+        <div class="bg-red-50 rounded-xl p-4 text-left mb-6 max-h-48 overflow-y-auto">
+            <ul class="space-y-1.5">
+                @foreach($errors->all() as $error)
+                <li class="flex items-start text-sm text-red-600">
+                    <svg class="w-4 h-4 mr-2 mt-0.5 flex-shrink-0 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                    </svg>
+                    <span>{{ $error }}</span>
+                </li>
+                @endforeach
+            </ul>
+        </div>
+        
+        <button onclick="closeErrorModal()" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2.5 px-6 rounded-xl transition-colors shadow-lg shadow-red-100">
+            OK, Saya Perbaiki
+        </button>
+    </div>
+</div>
+@endif
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Animasi Modal Error
+        const errorModal = document.getElementById('error-modal');
+        if (errorModal) {
+            setTimeout(() => {
+                errorModal.classList.remove('scale-95', 'opacity-0');
+                errorModal.classList.add('scale-100', 'opacity-100');
+            }, 50);
+        }
+    });
+
+    function closeErrorModal() {
+        const modal = document.getElementById('error-modal');
+        const overlay = document.getElementById('error-modal-overlay');
+        modal.classList.remove('scale-100', 'opacity-100');
+        modal.classList.add('scale-95', 'opacity-0');
+        overlay.classList.add('opacity-0');
+        setTimeout(() => overlay.remove(), 300);
+    }
+</script>
 @endsection

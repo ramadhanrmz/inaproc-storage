@@ -284,6 +284,25 @@
     </div>
 </div>
 
+{{-- MODAL NOTIFIKASI SUKSES --}}
+@if(session('success'))
+<div id="success-modal-overlay" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[9999] flex items-center justify-center transition-opacity duration-300">
+    <div id="success-modal" class="bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-full mx-4 text-center transform scale-95 opacity-0 transition-all duration-300">
+        {{-- Icon Animasi --}}
+        <div class="mx-auto w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center mb-5">
+            <svg class="w-10 h-10 text-emerald-500 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+            </svg>
+        </div>
+        <h3 class="text-xl font-black text-gray-800 mb-2">Berhasil!</h3>
+        <p class="text-sm text-gray-500 mb-6">{{ session('success') }}</p>
+        <button onclick="closeSuccessModal()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2.5 px-6 rounded-xl transition-colors shadow-lg shadow-emerald-100">
+            OK, Mengerti
+        </button>
+    </div>
+</div>
+@endif
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const searchInput = document.getElementById('search-input');
@@ -301,6 +320,24 @@
         searchInput.value = '';
         searchInput.focus();
         searchInput.value = val;
+
+        // Animasi Modal Sukses
+        const successModal = document.getElementById('success-modal');
+        if (successModal) {
+            setTimeout(() => {
+                successModal.classList.remove('scale-95', 'opacity-0');
+                successModal.classList.add('scale-100', 'opacity-100');
+            }, 50);
+        }
     });
+
+    function closeSuccessModal() {
+        const modal = document.getElementById('success-modal');
+        const overlay = document.getElementById('success-modal-overlay');
+        modal.classList.remove('scale-100', 'opacity-100');
+        modal.classList.add('scale-95', 'opacity-0');
+        overlay.classList.add('opacity-0');
+        setTimeout(() => overlay.remove(), 300);
+    }
 </script>
 @endsection
