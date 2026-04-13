@@ -213,8 +213,8 @@ public function exportPdf(Request $request)
         // ----------------------------------------------------------------
 
         // 3. Ambil data dan kelompokkan
-        // Michelle tambahkan orderBy agar di PDF urutannya rapi berdasarkan tanggal
-        $data = $query->orderBy('tanggal_daftar', 'asc')->get()->groupBy('opd');
+        // Urutkan berdasarkan nama OPD secara abjad A-Z agar laporan PDF rapi
+        $data = $query->orderBy('opd', 'asc')->get()->groupBy('opd');
 
         // Sisanya tetap sama...
         $namaBulan = $bulan ? date('F', mktime(0, 0, 0, $bulan, 1)) : '';
