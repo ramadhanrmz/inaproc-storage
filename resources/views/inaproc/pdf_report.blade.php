@@ -15,7 +15,8 @@
         .font-bold { font-weight: bold; }
         
         .footer { margin-top: 30px; float: right; width: 250px; text-align: center; }
-        .signature-space { height: 60px; }
+        .signature-space { height: 55px; margin: 5px 0; }
+        .signature-space img { height: 55px; width: auto; }
     </style>
 </head>
 <body>
@@ -105,7 +106,9 @@
     <div class="footer">
         Mataram, {{ date('d F Y') }}<br>
         Kepala Bagian LPSE
-        <div class="signature-space"></div>
+        <div class="signature-space">
+            <img src="{{ storage_path('app/private/images/tanda_tangan.png') }}" alt="Tanda Tangan">
+        </div>
         <span class="font-bold" style="text-decoration: underline;">Lalu Majemuk, S.Sos</span><br>
         NIP. 19711231 199402 1 015
     </div>

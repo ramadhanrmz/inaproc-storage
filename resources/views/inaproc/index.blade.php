@@ -8,7 +8,7 @@
             <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Coat_of_arms_of_West_Nusa_Tenggara.svg/500px-Coat_of_arms_of_West_Nusa_Tenggara.svg.png" class="h-14 w-auto" alt="Logo">
             <div>
                 <h1 class="text-2xl font-black text-blue-800 uppercase tracking-tight">Manajemen Akun Inaproc</h1>
-                <p class="text-xs text-gray-400 font-bold uppercase tracking-widest">Provinsi Nusa Tenggara Barat</p>
+                <p class="text-xs text-gray-400 font-bold uppercase tracking-widest">LPSE Provinsi Nusa Tenggara Barat</p>
             </div>
         </div>
         <div class="flex items-center space-x-3">
@@ -234,7 +234,10 @@
                         </td>
                         <td class="p-4 text-xs font-bold text-gray-600">{{ $item->opd }}</td>
                         <td class="p-4">
-                            <span class="inline-block px-2 py-1 rounded-md bg-blue-50 text-blue-700 text-[10px] font-black uppercase">{{ $item->status }}</span>
+                            <div class="flex flex-col items-start gap-1">
+                                <span class="inline-block px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 text-[10px] font-black uppercase">{{ $item->status }}</span>
+                                <span class="inline-block px-2 py-0.5 rounded-md {{ $item->jenis_data == 'SPSE' ? 'bg-purple-50 text-purple-600' : 'bg-orange-50 text-orange-600' }} text-[9px] font-bold">{{ $item->jenis_data }}</span>
+                            </div>
                         </td>
                         <td class="p-4">
                             <div class="text-[10px] leading-relaxed">

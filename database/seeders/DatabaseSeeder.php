@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        $this->call(SuperAdminSeeder::class);
         InaprocAccount::factory(50)->create();
     }
 }

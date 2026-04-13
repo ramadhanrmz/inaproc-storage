@@ -155,16 +155,16 @@ class InaprocAccountController extends Controller
                         ->with('success', 'Data Akun Berhasil Dihapus!');
     }
 
-    public function exportPdf(Request $request)
+public function exportPdf(Request $request)
     {
-        // 1. Tangkap semua filter yang aktif
+        // 1. Tangkap semua filter yang aktif (Sudah benar)
         $jenis = $request->get('jenis');
         $bulan = $request->get('bulan');
         $tahun = $request->get('tahun') ?? date('Y');
         $search = $request->get('search');
         $statusFilter = $request->get('status_filter');
 
-        // 2. Bangun Query yang sama dengan Index
+        // 2. Bangun Query
         $query = InaprocAccount::where('jenis_data', $jenis);
 
         if ($search) {
@@ -179,16 +179,21 @@ class InaprocAccountController extends Controller
             $query->where('status', $statusFilter);
         }
 
+        // --- KOREKSI DI SINI: Ganti created_at menjadi tanggal_daftar ---
         if ($bulan) {
-            $query->whereMonth('created_at', $bulan);
+            $query->whereMonth('tanggal_daftar', $bulan);
         }
         
-        $query->whereYear('created_at', $tahun);
+        if ($tahun) {
+            $query->whereYear('tanggal_daftar', $tahun);
+        }
+        // ----------------------------------------------------------------
 
         // 3. Ambil data dan kelompokkan
-        $data = $query->get()->groupBy('opd');
+        // Michelle tambahkan orderBy agar di PDF urutannya rapi berdasarkan tanggal
+        $data = $query->orderBy('tanggal_daftar', 'asc')->get()->groupBy('opd');
 
-        // KOREKSI: Jika hasil filter kosong, kirim pesan atau tetap proses empty collection
+        // Sisanya tetap sama...
         $namaBulan = $bulan ? date('F', mktime(0, 0, 0, $bulan, 1)) : '';
 
         $pdf = Pdf::loadView('inaproc.pdf_report', compact('data', 'namaBulan', 'tahun', 'jenis'))
