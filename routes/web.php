@@ -13,9 +13,9 @@ Route::get('/', function () {
 // 2. SEMUA ROUTE YANG WAJIB LOGIN
 Route::middleware(['auth', 'verified'])->group(function () {
     
-    // Dashboard (Bawaan Breeze, bisa tetap ada atau dihapus)
+    // Dashboard (Bawaan Breeze, dialihkan ke accounts index)
     Route::get('/dashboard', function () {
-        return view('dashboard');
+        return redirect()->route('inaproc-accounts.index');
     })->name('dashboard');
 
     // --- ROUTE UTAMA INAPROC ---

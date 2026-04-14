@@ -1,20 +1,24 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-md mb-10">
-    <h2 class="text-2xl font-bold mb-6 text-gray-800 border-b pb-2">Form Tambah Akun Inaproc</h2>
+<div class="max-w-4xl mx-auto bg-white p-8 md:p-10 rounded-2xl shadow-xl outline outline-1 outline-gray-100 mb-10">
+    <div class="flex flex-col items-center justify-center mb-10 pb-6 border-b border-gray-100">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Coat_of_arms_of_West_Nusa_Tenggara.svg/500px-Coat_of_arms_of_West_Nusa_Tenggara.svg.png" class="h-16 w-auto mb-4" alt="Logo NTB">
+        <h2 class="text-2xl font-black text-gray-800 tracking-tight">Form Tambah Akun Inaproc</h2>
+        <p class="text-sm font-bold text-gray-500 mt-1">LPSE Provinsi Nusa Tenggara Barat</p>
+    </div>
 
     <form action="{{ route('inaproc-accounts.store') }}" method="POST">
         @csrf
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-                <label class="block text-gray-700 font-bold mb-1">Nama Lengkap <span class="text-danger text-red-500">*</span></label>
-                <input type="text" name="nama" value="{{ old('nama') }}" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400 {{ $errors->has('nama') ? 'border-red-400 bg-red-50' : '' }}" placeholder="Contoh: Muhajidin, S.Pd., MM" required>
+                <label class="block text-xs font-bold text-gray-600 uppercase tracking-widest mb-2">Nama Lengkap <span class="text-danger text-red-500">*</span></label>
+                <input type="text" name="nama" value="{{ old('nama') }}" class="w-full border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus:bg-white text-sm transition-all focus:ring-2 focus:ring-blue-400 {{ $errors->has('nama') ? 'border-red-400 bg-red-50' : '' }}" placeholder="Contoh: Muhajidin, S.Pd., MM" required>
             </div>
 
             <div>
-                <label class="block text-gray-700 font-bold mb-1">Perangkat Daerah (OPD) <span class="text-danger text-red-500">*</span></label>
-                <input list="list_opd" name="opd" value="{{ old('opd') }}" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400 {{ $errors->has('opd') ? 'border-red-400 bg-red-50' : '' }}" placeholder="Ketik atau pilih OPD..." required>
+                <label class="block text-xs font-bold text-gray-600 uppercase tracking-widest mb-2">Perangkat Daerah (OPD) <span class="text-danger text-red-500">*</span></label>
+                <input list="list_opd" name="opd" value="{{ old('opd') }}" class="w-full border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus:bg-white text-sm transition-all focus:ring-2 focus:ring-blue-400 {{ $errors->has('opd') ? 'border-red-400 bg-red-50' : '' }}" placeholder="Ketik atau pilih OPD..." required>
                 <datalist id="list_opd">
                     <option value="Badan Kesatuan Bangsa dan Politik Dalam Negeri">
                     <option value="Badan Kepegawaian Daerah">
@@ -133,8 +137,8 @@
             </div>
 
             <div>
-                <label class="block text-gray-700 font-bold mb-1">Status <span class="text-danger text-red-500">*</span></label>
-                <select name="status" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400" required>
+                <label class="block text-xs font-bold text-gray-600 uppercase tracking-widest mb-2">Status <span class="text-danger text-red-500">*</span></label>
+                <select name="status" class="w-full border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus:bg-white text-sm transition-all focus:ring-2 focus:ring-blue-400" required>
                     @foreach(['PPK', 'PP', 'Bendahara', 'POKJA', 'Auditor', 'PA', 'KPA'] as $st)
                         <option value="{{ $st }}" {{ old('status') == $st ? 'selected' : '' }}>{{ $st }}</option>
                     @endforeach
@@ -142,55 +146,60 @@
             </div>
 
             <div>
-                <label class="block text-gray-700 font-bold mb-1">User ID <span class="text-danger text-red-500">*</span></label>
-                <input type="text" name="user_id" value="{{ old('user_id') }}" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400 {{ $errors->has('user_id') ? 'border-red-400 bg-red-50' : '' }}" placeholder="Contoh: MUHAJIDINPPK" required>
+                <label class="block text-xs font-bold text-gray-600 uppercase tracking-widest mb-2">User ID <span class="text-danger text-red-500">*</span></label>
+                <input type="text" name="user_id" value="{{ old('user_id') }}" class="w-full border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus:bg-white text-sm transition-all focus:ring-2 focus:ring-blue-400 {{ $errors->has('user_id') ? 'border-red-400 bg-red-50' : '' }}" placeholder="Contoh: MUHAJIDINPPK" required>
             </div>
 
             <div>
-                <label class="block text-gray-700 font-bold mb-1">NIK <span class="text-danger text-red-500">*</span></label>
-                <input type="number" name="nik" value="{{ old('nik') }}" oninput="if(this.value.length > 16) this.value = this.value.slice(0, 16);" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400 {{ $errors->has('nik') ? 'border-red-400 bg-red-50' : '' }}" placeholder="Maksimal 16 angka" required>
+                <label class="block text-xs font-bold text-gray-600 uppercase tracking-widest mb-2">NIK <span class="text-danger text-red-500">*</span></label>
+                <input type="number" name="nik" value="{{ old('nik') }}" oninput="if(this.value.length > 16) this.value = this.value.slice(0, 16);" class="w-full border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus:bg-white text-sm transition-all focus:ring-2 focus:ring-blue-400 {{ $errors->has('nik') ? 'border-red-400 bg-red-50' : '' }}" placeholder="Maksimal 16 angka" required>
                 <small class="text-gray-400">Maksimal 16 angka.</small>
             </div>
 
             <div>
-                <label class="block text-gray-700 font-bold mb-1">NIP <span class="text-danger text-red-500">*</span></label>
-                <input type="number" name="nip" value="{{ old('nip') }}" oninput="if(this.value.length > 18) this.value = this.value.slice(0, 18);" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400 {{ $errors->has('nip') ? 'border-red-400 bg-red-50' : '' }}" placeholder="Maksimal 18 angka" required>
+                <label class="block text-xs font-bold text-gray-600 uppercase tracking-widest mb-2">NIP <span class="text-danger text-red-500">*</span></label>
+                <input type="number" name="nip" value="{{ old('nip') }}" oninput="if(this.value.length > 18) this.value = this.value.slice(0, 18);" class="w-full border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus:bg-white text-sm transition-all focus:ring-2 focus:ring-blue-400 {{ $errors->has('nip') ? 'border-red-400 bg-red-50' : '' }}" placeholder="Maksimal 18 angka" required>
                 <small class="text-gray-400">Maksimal 18 angka.</small>
             </div>
 
             <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4 bg-gray-50 p-4 rounded mt-2">
                 <div>
-                    <label class="block text-gray-700 font-bold mb-1 text-sm">No. Surat Permohonan <span class="text-red-500">*</span></label>
-                    <input type="text" name="no_surat_permohonan" value="{{ old('no_surat_permohonan') }}" class="w-full border rounded px-3 py-2 bg-white {{ $errors->has('no_surat_permohonan') ? 'border-red-400 bg-red-50' : '' }}" required>
+                    <label class="block text-xs font-bold text-gray-600 uppercase tracking-widest mb-2">No. Surat Permohonan <span class="text-red-500">*</span></label>
+                    <input type="text" name="no_surat_permohonan" value="{{ old('no_surat_permohonan') }}" class="w-full border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus:bg-white text-sm transition-all bg-white {{ $errors->has('no_surat_permohonan') ? 'border-red-400 bg-red-50' : '' }}" required>
                 </div>
                 <div>
-                    <label class="block text-gray-700 font-bold mb-1 text-sm">Perihal <span class="text-red-500">*</span></label>
-                    <select name="perihal_permohonan" class="w-full border rounded px-3 py-2 bg-white font-bold" required>
+                    <label class="block text-xs font-bold text-gray-600 uppercase tracking-widest mb-2">Perihal <span class="text-red-500">*</span></label>
+                    <select name="perihal_permohonan" class="w-full border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus:bg-white text-sm transition-all bg-white font-bold" required>
                         <option value="Penerbitan Akun" {{ old('perihal_permohonan') == 'Penerbitan Akun' ? 'selected' : '' }}>Penerbitan Akun</option>
                         <option value="Update Akun" {{ old('perihal_permohonan') == 'Update Akun' ? 'selected' : '' }}>Update Akun</option>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-gray-700 font-bold mb-1 text-sm">Nomor SK <span class="text-red-500">*</span></label>
-                    <input type="text" name="no_sk" value="{{ old('no_sk') }}" class="w-full border rounded px-3 py-2 bg-white {{ $errors->has('no_sk') ? 'border-red-400 bg-red-50' : '' }}" required>
+                    <label class="block text-xs font-bold text-gray-600 uppercase tracking-widest mb-2">Nomor SK <span class="text-red-500">*</span></label>
+                    <input type="text" name="no_sk" value="{{ old('no_sk') }}" class="w-full border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus:bg-white text-sm transition-all bg-white {{ $errors->has('no_sk') ? 'border-red-400 bg-red-50' : '' }}" required>
                 </div>
             </div>
 
             <div>
-                <label class="block text-gray-700 font-bold mb-1">Pangkat/Gol <span class="text-danger text-red-500">*</span></label>
-                <input type="text" name="pangkat_gol" value="{{ old('pangkat_gol') }}" class="w-full border rounded px-3 py-2 {{ $errors->has('pangkat_gol') ? 'border-red-400 bg-red-50' : '' }}" required>
+                <label class="block text-xs font-bold text-gray-600 uppercase tracking-widest mb-2">Pangkat/Gol <span class="text-danger text-red-500">*</span></label>
+                <input type="text" name="pangkat_gol" value="{{ old('pangkat_gol') }}" class="w-full border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus:bg-white text-sm transition-all {{ $errors->has('pangkat_gol') ? 'border-red-400 bg-red-50' : '' }}" required>
             </div>
             <div>
-                <label class="block text-gray-700 font-bold mb-1">Jabatan <span class="text-danger text-red-500">*</span></label>
-                <input type="text" name="jabatan" value="{{ old('jabatan') }}" class="w-full border rounded px-3 py-2 {{ $errors->has('jabatan') ? 'border-red-400 bg-red-50' : '' }}" required>
+                <label class="block text-xs font-bold text-gray-600 uppercase tracking-widest mb-2">Jabatan <span class="text-danger text-red-500">*</span></label>
+                <input type="text" name="jabatan" value="{{ old('jabatan') }}" class="w-full border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus:bg-white text-sm transition-all {{ $errors->has('jabatan') ? 'border-red-400 bg-red-50' : '' }}" required>
             </div>
 
             <div>
-                <label class="block text-gray-700 font-bold mb-1">No WhatsApp <span class="text-danger text-red-500">*</span></label>
-                <input type="number" name="no_hp" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400 {{ $errors->has('no_hp') ? 'border-red-400 bg-red-50' : '' }}" 
-                    oninput="if(this.value.length > 12) this.value = this.value.slice(0, 12);" 
-                    required value="{{ old('no_hp') }}" placeholder="Contoh: 087865xxxxxx">
-                <small class="text-gray-500 text-xs">Maksimal 12 angka.</small>
+                <label class="block text-xs font-bold text-gray-600 uppercase tracking-widest mb-2">No WhatsApp <span class="text-danger text-red-500">*</span></label>
+                <div class="flex items-stretch focus-within:ring-2 focus-within:ring-blue-400 rounded transition-all {{ $errors->has('no_hp') ? 'ring-2 ring-red-400' : '' }}">
+                    <span class="flex items-center justify-center px-4 bg-gray-100 border border-r-0 border-gray-300 rounded-l-xl text-gray-600 font-black text-sm">
+                        +62
+                    </span>
+                    <input type="number" name="no_hp" class="w-full border border-gray-200 bg-gray-50 focus:bg-white transition-all rounded-none rounded-r-xl px-4 py-3 text-sm outline-none focus:ring-0 {{ $errors->has('no_hp') ? 'bg-red-50 border-red-400' : '' }}" 
+                        oninput="if(this.value.length > 11) this.value = this.value.slice(0, 11);" 
+                        required value="{{ old('no_hp') }}" placeholder="87865xxxxxx">
+                </div>
+                <small class="text-gray-500 text-xs mt-1 block">Maksimal 11 angka (tanpa 0 awalan).</small>
             </div>
 
             <div class="mt-4">
@@ -204,7 +213,7 @@
             </div>
 
             <div>
-                <label class="block text-gray-700 font-bold mb-1">Sumber Data <span class="text-danger text-red-500">*</span></label>
+                <label class="block text-xs font-bold text-gray-600 uppercase tracking-widest mb-2">Sumber Data <span class="text-danger text-red-500">*</span></label>
                 <div class="mt-2 space-x-6">
                     <label class="inline-flex items-center">
                         <input type="radio" name="sumber" value="Fisik" class="form-radio text-blue-600" {{ old('sumber', 'Fisik') == 'Fisik' ? 'checked' : '' }} required>
@@ -218,7 +227,7 @@
             </div>
 
             <div>
-                <label class="block text-gray-700 font-bold mb-1">Jenis Data <span class="text-red-500">*</span></label>
+                <label class="block text-xs font-bold text-gray-600 uppercase tracking-widest mb-2">Jenis Data <span class="text-red-500">*</span></label>
                 <div class="mt-2 space-x-6">
                     <label class="inline-flex items-center">
                         <input type="radio" name="jenis_data" value="Katalog v.6" class="form-radio text-blue-600" {{ old('jenis_data', 'Katalog v.6') == 'Katalog v.6' ? 'checked' : '' }} required>
@@ -232,14 +241,14 @@
             </div>
 
             <div class="md:col-span-2">
-                <label class="block text-gray-700 font-bold mb-1">Alamat <span class="text-danger text-red-500">*</span></label>
-                <textarea name="alamat" rows="3" class="w-full border rounded px-3 py-2 {{ $errors->has('alamat') ? 'border-red-400 bg-red-50' : '' }}" required>{{ old('alamat') }}</textarea>
+                <label class="block text-xs font-bold text-gray-600 uppercase tracking-widest mb-2">Alamat <span class="text-danger text-red-500">*</span></label>
+                <textarea name="alamat" rows="3" class="w-full border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus:bg-white text-sm transition-all {{ $errors->has('alamat') ? 'border-red-400 bg-red-50' : '' }}" required>{{ old('alamat') }}</textarea>
             </div>
         </div>
 
         <div class="mt-6 flex justify-end gap-2">
-            <a href="{{ route('inaproc-accounts.index') }}" class="bg-gray-500 text-white px-6 py-2 rounded hover:bg-gray-600 transition">Batal</a>
-            <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 shadow-lg font-bold">Simpan Data</button>
+            <a href="{{ route('inaproc-accounts.index') }}" class="bg-white border border-gray-300 text-gray-700 px-6 py-3 rounded-xl hover:bg-gray-50 font-bold transition-all">Batal</a>
+            <button type="submit" class="w-full md:w-auto bg-blue-600 text-white px-8 py-3 rounded-xl hover:bg-blue-700 shadow-lg font-black transition-all">Simpan Data</button>
         </div>
     </form>
 </div>

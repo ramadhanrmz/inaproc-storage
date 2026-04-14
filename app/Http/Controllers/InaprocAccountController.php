@@ -273,6 +273,9 @@ class InaprocAccountController extends Controller
             'tanggal_daftar.date' => 'Format tanggal tidak valid.',
         ]);
 
+        // Format No HP menjadi awalan 62 secara otomatis
+        $validated['no_hp'] = '62' . ltrim($validated['no_hp'], '0');
+
         InaprocAccount::create($validated);
 
         return redirect()->route('inaproc-accounts.index')
@@ -306,6 +309,9 @@ class InaprocAccountController extends Controller
             'sumber' => 'required',
             'jenis_data' => 'required',
         ]);
+
+        // Format No HP menjadi awalan 62 secara otomatis
+        $validated['no_hp'] = '62' . ltrim($validated['no_hp'], '0');
 
         $inaprocAccount->update($validated);
 
