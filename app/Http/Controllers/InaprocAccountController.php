@@ -14,7 +14,8 @@ class InaprocAccountController extends Controller
         // 1. Ambil semua filter dari request
         $search = $request->get('search');
         $statusFilter = $request->get('status_filter');
-        $bulan = $request->get('bulan');
+        $startMonth = $request->get('start_month');
+        $endMonth = $request->get('end_month');
         $tahun = $request->get('tahun');
         $jenisFilter = $request->get('jenis_filter');
         $perPage = $request->get('per_page', 10);
@@ -34,7 +35,14 @@ class InaprocAccountController extends Controller
             $query->where('status', $statusFilter);
         }
 
-        if ($bulan) $query->whereMonth('tanggal_daftar', $bulan);
+        if ($startMonth || $endMonth) {
+            $s = $startMonth ? (int)$startMonth : 1;
+            $e = $endMonth ? (int)$endMonth : 12;
+            if ($s > $e) $e = $s;
+            $query->whereMonth('tanggal_daftar', '>=', $s)
+                  ->whereMonth('tanggal_daftar', '<=', $e);
+        }
+        
         if ($tahun) $query->whereYear('tanggal_daftar', $tahun);
         if ($jenisFilter) $query->where('jenis_data', $jenisFilter);
 
@@ -43,7 +51,13 @@ class InaprocAccountController extends Controller
         $baseDetail = InaprocAccount::query();
 
         // Filter Waktu
-        if ($bulan) $baseDetail->whereMonth('tanggal_daftar', $bulan);
+        if ($startMonth || $endMonth) {
+            $s = $startMonth ? (int)$startMonth : 1;
+            $e = $endMonth ? (int)$endMonth : 12;
+            if ($s > $e) $e = $s;
+            $baseDetail->whereMonth('tanggal_daftar', '>=', $s)
+                       ->whereMonth('tanggal_daftar', '<=', $e);
+        }
         if ($tahun) $baseDetail->whereYear('tanggal_daftar', $tahun);
 
         // FILTER BARU: Masukkan filter status ke baseDetail agar angka detail ikut nol jika tidak sesuai
@@ -72,10 +86,140 @@ class InaprocAccountController extends Controller
 
         // 4. Eksekusi Query Tabel
         $accounts = ($perPage == 'semua') 
-            ? $query->orderBy('tanggal_daftar', 'desc')->get() 
-            : $query->orderBy('tanggal_daftar', 'desc')->paginate($perPage)->withQueryString();
+            ? $query->orderBy('id', 'desc')->get() 
+            : $query->orderBy('id', 'desc')->paginate($perPage)->withQueryString();
 
         return view('inaproc.index', compact('accounts', 'stats'));
+    }
+
+    public function grafik(Request $request)
+    {
+        $tahun = $request->get('tahun', date('Y'));
+        
+        $katalogStart = $request->get('katalog_start');
+        $katalogEnd = $request->get('katalog_end');
+        $spseStart = $request->get('spse_start');
+        $spseEnd = $request->get('spse_end');
+
+        // Set default filter values to full year if not set
+        $kStart = $katalogStart ? (int)$katalogStart : 1;
+        $kEnd = $katalogEnd ? (int)$katalogEnd : 12;
+        if ($kStart > $kEnd) $kEnd = $kStart; // fallback if start > end
+
+        $sStart = $spseStart ? (int)$spseStart : 1;
+        $sEnd = $spseEnd ? (int)$spseEnd : 12;
+        if ($sStart > $sEnd) $sEnd = $sStart; 
+
+        $bulanNames = [
+            1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
+            5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
+            9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
+        ];
+
+        // === KATALOG V.6 DATA ===
+        $katalogLabels = [];
+        $katalogPpk = [];
+        $katalogPp = [];
+        $katalogBendahara = [];
+        $katalogAkumulasi = [];
+        $katalogRunningTotal = 0;
+        $katalogTotalFilter = 0;
+
+        for ($m = 1; $m <= 12; $m++) {
+            $ppk = InaprocAccount::where('jenis_data', 'Katalog v.6')
+                ->where('status', 'PPK')
+                ->whereMonth('tanggal_daftar', $m)
+                ->whereYear('tanggal_daftar', $tahun)
+                ->count();
+
+            $pp = InaprocAccount::where('jenis_data', 'Katalog v.6')
+                ->where('status', 'PP')
+                ->whereMonth('tanggal_daftar', $m)
+                ->whereYear('tanggal_daftar', $tahun)
+                ->count();
+
+            $bdh = InaprocAccount::where('jenis_data', 'Katalog v.6')
+                ->where('status', 'Bendahara')
+                ->whereMonth('tanggal_daftar', $m)
+                ->whereYear('tanggal_daftar', $tahun)
+                ->count();
+
+            $totalBulan = $ppk + $pp + $bdh;
+
+            if ($totalBulan > 0) {
+                $katalogRunningTotal += $totalBulan;
+                
+                if ($m >= $kStart && $m <= $kEnd) {
+                    $katalogTotalFilter += $totalBulan;
+                    $katalogLabels[] = $bulanNames[$m];
+                    $katalogPpk[] = $ppk;
+                    $katalogPp[] = $pp;
+                    $katalogBendahara[] = $bdh;
+                    $katalogAkumulasi[] = [
+                        'bulan' => $bulanNames[$m],
+                        'total' => $katalogRunningTotal,
+                    ];
+                }
+            }
+        }
+
+        $katalogData = [
+            'labels' => $katalogLabels,
+            'ppk' => $katalogPpk,
+            'pp' => $katalogPp,
+            'bendahara' => $katalogBendahara,
+            'akumulasi' => $katalogAkumulasi,
+            'total_filter' => $katalogTotalFilter,
+        ];
+
+        // === SPSE DATA ===
+        $spseLabels = [];
+        $spsePpk = [];
+        $spsePp = [];
+        $spseAkumulasi = [];
+        $spseRunningTotal = 0;
+        $spseTotalFilter = 0;
+
+        for ($m = 1; $m <= 12; $m++) {
+            $ppk = InaprocAccount::where('jenis_data', 'SPSE')
+                ->where('status', 'PPK')
+                ->whereMonth('tanggal_daftar', $m)
+                ->whereYear('tanggal_daftar', $tahun)
+                ->count();
+
+            $pp = InaprocAccount::where('jenis_data', 'SPSE')
+                ->where('status', 'PP')
+                ->whereMonth('tanggal_daftar', $m)
+                ->whereYear('tanggal_daftar', $tahun)
+                ->count();
+
+            $totalBulan = $ppk + $pp;
+
+            if ($totalBulan > 0) {
+                $spseRunningTotal += $totalBulan;
+                
+                if ($m >= $sStart && $m <= $sEnd) {
+                    $spseTotalFilter += $totalBulan;
+                    $spseLabels[] = $bulanNames[$m];
+                    $spsePpk[] = $ppk;
+                    $spsePp[] = $pp;
+                    $spseAkumulasi[] = [
+                        'bulan' => $bulanNames[$m],
+                        'total' => $spseRunningTotal,
+                    ];
+                }
+            }
+        }
+
+        $spseData = [
+            'labels' => $spseLabels,
+            'ppk' => $spsePpk,
+            'pp' => $spsePp,
+            'akumulasi' => $spseAkumulasi,
+            'total_filter' => $spseTotalFilter,
+        ];
+
+        return view('inaproc.grafik', compact('katalogData', 'spseData', 'tahun'));
     }
 
     // Menampilkan halaman form tambah data

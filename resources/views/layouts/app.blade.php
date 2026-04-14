@@ -18,5 +18,6 @@
         {{-- Jaga-jaga agar tidak error undefined variable --}}
         {{ $slot ?? '' }}
     </div>
+    @stack('scripts')
 </body>
 </html>

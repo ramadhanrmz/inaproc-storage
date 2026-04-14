@@ -19,6 +19,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('dashboard');
 
     // --- ROUTE UTAMA INAPROC ---
+    Route::get('/accounts/grafik', [InaprocAccountController::class, 'grafik'])->name('inaproc.grafik');
+
     Route::resource('accounts', InaprocAccountController::class)
         ->parameters(['accounts' => 'inaprocAccount'])
         ->names('inaproc-accounts');

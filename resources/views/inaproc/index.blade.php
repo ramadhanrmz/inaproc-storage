@@ -12,6 +12,12 @@
             </div>
         </div>
         <div class="flex items-center space-x-3">
+            {{-- Tombol Grafik --}}
+            <a href="{{ route('inaproc.grafik') }}" class="inline-flex items-center justify-center bg-indigo-600 hover:bg-indigo-700 text-white h-10 px-6 rounded-lg shadow-md shadow-indigo-100 transition-all font-bold text-sm">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                Grafik
+            </a>
+
             {{-- Tombol Tambah Data Modern --}}
             <a href="{{ route('inaproc-accounts.create') }}" class="inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white h-10 px-6 rounded-lg shadow-md shadow-blue-100 transition-all font-bold text-sm">
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
@@ -142,12 +148,19 @@
     </div>
 
         <form id="auto-filter-form" action="{{ route('inaproc-accounts.index') }}" method="GET" class="flex flex-wrap items-center gap-3">
-            <div class="flex items-center bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-200">
-                <span class="text-[10px] font-black text-gray-400 uppercase mr-2">Filter:</span>
-                <select name="bulan" onchange="this.form.submit()" class="bg-transparent border-none text-xs font-bold text-gray-600 focus:ring-0 cursor-pointer p-0">
+            <div class="flex items-center gap-1 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-200">
+                <span class="text-[10px] font-black text-gray-400 uppercase mr-1">Rentang :</span>
+                <select name="start_month" onchange="this.form.submit()" class="bg-transparent border-none text-xs font-bold text-gray-600 focus:ring-0 cursor-pointer p-0 w-24">
                     <option value="">Semua Bulan</option>
-                    @for($i=1; $i<=12; $i++) 
-                        <option value="{{$i}}" {{ request('bulan') == $i ? 'selected' : '' }}>{{ date('F', mktime(0,0,0,$i,1)) }}</option> 
+                    @for($i=1; $i<=12; $i++)
+                        <option value="{{$i}}" {{ request('start_month') == $i ? 'selected' : '' }}>{{ date('M', mktime(0,0,0,$i,1)) }}</option>
+                    @endfor
+                </select>
+                <span class="text-xs text-gray-400 font-bold">-</span>
+                <select name="end_month" onchange="this.form.submit()" class="bg-transparent border-none text-xs font-bold text-gray-600 focus:ring-0 cursor-pointer p-0 w-24 ml-1">
+                    <option value="">Semua Bulan</option>
+                    @for($i=1; $i<=12; $i++)
+                        <option value="{{$i}}" {{ request('end_month') == $i ? 'selected' : '' }}>{{ date('M', mktime(0,0,0,$i,1)) }}</option>
                     @endfor
                 </select>
             </div>
@@ -190,7 +203,7 @@
 
                 {{-- FILTER JENIS DATA YANG TADI HILANG --}}
                 <div class="flex items-center space-x-2 border-l border-gray-100 pl-4">
-                    <span class="text-[10px] font-black text-gray-400 uppercase">Jenis:</span>
+                    <span class="text-[10px] font-black text-gray-400 uppercase">Jenis Data:</span>
                     <select name="jenis_filter" form="auto-filter-form" onchange="this.form.submit()" 
                             class="border-gray-200 rounded-lg text-xs font-black text-blue-700 p-1 focus:ring-blue-500 bg-blue-50/50">
                         <option value="">Semua</option>
