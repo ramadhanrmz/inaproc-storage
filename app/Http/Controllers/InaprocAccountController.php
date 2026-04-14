@@ -369,6 +369,94 @@ public function exportPdf(Request $request)
         return $pdf->stream("Rekapitulasi_{$jenis}.pdf");
     }
 
+    public function exportCsv(Request $request)
+    {
+        $search = $request->get('search');
+        $statusFilter = $request->get('status_filter');
+        $startMonth = $request->get('start_month');
+        $endMonth = $request->get('end_month');
+        $tahun = $request->get('tahun', date('Y'));
+        $jenisFilter = $request->get('jenis_filter');
+
+        $query = InaprocAccount::query();
+
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('nama', 'like', "%{$search}%")
+                ->orWhere('user_id', 'like', "%{$search}%")
+                ->orWhere('opd', 'like', "%{$search}%");
+            });
+        }
+
+        if ($statusFilter && $statusFilter != 'Semua Tipe') {
+            $query->where('status', $statusFilter);
+        }
+
+        if ($startMonth || $endMonth) {
+            $s = $startMonth ? (int)$startMonth : 1;
+            $e = $endMonth ? (int)$endMonth : 12;
+            if ($s > $e) $e = $s;
+            $query->whereMonth('tanggal_daftar', '>=', $s)
+                  ->whereMonth('tanggal_daftar', '<=', $e);
+        }
+        
+        if ($tahun) {
+            $query->whereYear('tanggal_daftar', $tahun);
+        }
+
+        if ($jenisFilter) {
+            $query->where('jenis_data', $jenisFilter);
+        }
+
+        $data = $query->orderBy('id', 'desc')->get();
+
+        $filename = "Rekapitulasi_Inaproc_" . date('Y-m-d') . ".csv";
+        $headers = [
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=$filename",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        ];
+
+        $columns = [
+            'No.', 'Nama Lengkap', 'Perangkat Daerah', 'Status', 'No. Surat Permohonan', 'Perihal Permohonan', 
+            'No SK', 'User ID', 'NIK', 'NIP', 'Pangkat/Gol', 'Jabatan', 
+            'No. WhatsApp', 'Alamat', 'Sumber Data', 'Jenis Data', 'Tanggal Aktif'
+        ];
+
+        $callback = function() use($data, $columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+            
+            $no = 1;
+            foreach ($data as $row) {
+                fputcsv($file, [
+                    $no++,
+                    $row->nama,
+                    $row->opd,
+                    $row->status,
+                    $row->no_surat_permohonan,
+                    $row->perihal_permohonan,
+                    $row->no_sk,
+                    $row->user_id,
+                    "'" . $row->nik, // Format teks agar angka panjang tidak berantakan di Excel
+                    "'" . $row->nip,
+                    $row->pangkat_gol,
+                    $row->jabatan,
+                    "'" . $row->no_hp,
+                    $row->alamat,
+                    $row->sumber,
+                    $row->jenis_data,
+                    \Carbon\Carbon::parse($row->tanggal_daftar)->format('d/m/Y')
+                ]);
+            }
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
     public function import(Request $request)
     {
         $request->validate([
