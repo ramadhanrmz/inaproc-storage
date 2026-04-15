@@ -514,6 +514,13 @@ public function exportPdf(Request $request)
             $jenis_data = trim($data[$idx + 14] ?? 'Katalog v.6');
             $rawTanggal = trim($data[$idx + 15] ?? '');
 
+            // Formatter untuk Nomor HP otomatis 62
+            if (str_starts_with($no_hp, '0')) {
+                $no_hp = '62' . substr($no_hp, 1);
+            } elseif (str_starts_with($no_hp, '8')) {
+                $no_hp = '62' . $no_hp;
+            }
+
             // Pengecekan dibuat SANGAT KETAT hanya berdasarkan User ID
             $exists = InaprocAccount::where('user_id', $user_id)->exists();
 
