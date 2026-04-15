@@ -86,8 +86,8 @@ class InaprocAccountController extends Controller
 
         // 4. Eksekusi Query Tabel
         $accounts = ($perPage == 'semua') 
-            ? $query->orderBy('id', 'desc')->get() 
-            : $query->orderBy('id', 'desc')->paginate($perPage)->withQueryString();
+            ? $query->orderBy('tanggal_daftar', 'desc')->orderBy('id', 'desc')->get() 
+            : $query->orderBy('tanggal_daftar', 'desc')->orderBy('id', 'desc')->paginate($perPage)->withQueryString();
 
         return view('inaproc.index', compact('accounts', 'stats'));
     }
@@ -238,7 +238,7 @@ class InaprocAccountController extends Controller
             'no_surat_permohonan' => 'required',
             'perihal_permohonan' => 'required',
             'no_sk' => 'required',
-            'user_id' => 'required|unique:inaproc_accounts,user_id',
+            'user_id' => $request->status === 'PP' ? 'required' : 'required|unique:inaproc_accounts,user_id',
             'nik' => 'required|numeric|digits:16',
             'nip' => 'required|numeric|digits:18',
             'pangkat_gol' => 'required',
@@ -300,7 +300,7 @@ class InaprocAccountController extends Controller
             'no_surat_permohonan' => 'required',
             'perihal_permohonan' => 'required',
             'no_sk' => 'required',
-            'user_id' => 'required|unique:inaproc_accounts,user_id,' . $inaprocAccount->id,
+            'user_id' => $request->status === 'PP' ? 'required' : 'required|unique:inaproc_accounts,user_id,' . $inaprocAccount->id,
             'nik' => 'required|numeric|digits:16',
             'nip' => 'required|numeric|digits:18',
             'pangkat_gol' => 'required',
@@ -418,7 +418,7 @@ public function exportPdf(Request $request)
             $query->where('jenis_data', $jenisFilter);
         }
 
-        $data = $query->orderBy('id', 'desc')->get();
+        $data = $query->orderBy('tanggal_daftar', 'desc')->orderBy('id', 'desc')->get();
 
         $filename = "Rekapitulasi_Inaproc_" . date('Y-m-d') . ".csv";
         $headers = [
@@ -521,8 +521,11 @@ public function exportPdf(Request $request)
                 $no_hp = '62' . $no_hp;
             }
 
-            // Pengecekan dibuat SANGAT KETAT hanya berdasarkan User ID
-            $exists = InaprocAccount::where('user_id', $user_id)->exists();
+            // Pengecekan dibuat SANGAT KETAT hanya berdasarkan User ID, kecuali untuk status PP
+            $exists = false;
+            if (strtoupper($status) !== 'PP') {
+                $exists = InaprocAccount::where('user_id', $user_id)->exists();
+            }
 
             if ($exists) {
                 // Simpan user_id yang gagal karena duplikat
