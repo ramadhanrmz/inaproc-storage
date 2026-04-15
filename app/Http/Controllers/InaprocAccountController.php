@@ -238,7 +238,7 @@ class InaprocAccountController extends Controller
             'no_surat_permohonan' => 'required',
             'perihal_permohonan' => 'required',
             'no_sk' => 'required',
-            'user_id' => 'required',
+            'user_id' => 'required|unique:inaproc_accounts,user_id',
             'nik' => 'required|numeric|digits:16',
             'nip' => 'required|numeric|digits:18',
             'pangkat_gol' => 'required',
@@ -256,6 +256,7 @@ class InaprocAccountController extends Controller
             'perihal_permohonan.required' => 'Perihal Permohonan wajib dipilih.',
             'no_sk.required' => 'Nomor SK wajib diisi.',
             'user_id.required' => 'User ID wajib diisi.',
+            'user_id.unique' => 'User ID ini sudah pernah didaftarkan.',
             'nik.required' => 'NIK wajib diisi.',
             'nik.numeric' => 'NIK harus berupa angka.',
             'nik.digits' => 'NIK harus tepat 16 digit.',
@@ -299,7 +300,7 @@ class InaprocAccountController extends Controller
             'no_surat_permohonan' => 'required',
             'perihal_permohonan' => 'required',
             'no_sk' => 'required',
-            'user_id' => 'required',
+            'user_id' => 'required|unique:inaproc_accounts,user_id,' . $inaprocAccount->id,
             'nik' => 'required|numeric|digits:16',
             'nip' => 'required|numeric|digits:18',
             'pangkat_gol' => 'required',
@@ -308,6 +309,8 @@ class InaprocAccountController extends Controller
             'alamat' => 'required',
             'sumber' => 'required',
             'jenis_data' => 'required',
+        ], [
+            'user_id.unique' => 'User ID ini sudah pernah didaftarkan.',
         ]);
 
         // Format No HP menjadi awalan 62 secara otomatis
@@ -322,10 +325,11 @@ class InaprocAccountController extends Controller
     // Menghapus data
     public function destroy(InaprocAccount $inaprocAccount)
     {
+        $userId = $inaprocAccount->user_id;
         $inaprocAccount->delete();
 
         return redirect()->route('inaproc-accounts.index')
-                        ->with('success', 'Data Akun Berhasil Dihapus!');
+                        ->with('success', "Data Akun $userId Berhasil Dihapus!");
     }
 
 public function exportPdf(Request $request)
@@ -472,36 +476,63 @@ public function exportPdf(Request $request)
         $file = $request->file('csv_file');
         $handle = fopen($file->getRealPath(), "r");
         
-        fgetcsv($handle); 
+        $header = fgetcsv($handle); 
+        
+        // Deteksi apakah ini format "Export CSV" atau "Template Baru"
+        // Export CSV biasanya kolom pertamanya adalah "No." atau "No"
+        $firstCol = strtolower(trim($header[0] ?? ''));
+        $isExportFormat = ($firstCol === 'no.' || $firstCol === 'no');
 
         $count = 0;
+        $skippedUserIds = [];
+        
         while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
             
-            // Skip baris kosong (misal akibat enter tambahan di akhir file)
             if (empty(array_filter($data))) {
                 continue;
             }
 
-            // Cek duplikasi, skip jika data sudah ada di database
-            // Kita cek berdasarkan NIK, User ID, Status, dan Jenis Data
-            $exists = InaprocAccount::where('nik', $data[7] ?? '')
-                        ->where('user_id', $data[6] ?? '')
-                        ->where('status', $data[2] ?? '')
-                        ->where('jenis_data', $data[14] ?? 'Katalog v.6')
-                        ->exists();
+            // Tentukan index berdasarkan format CSV
+            $idx = $isExportFormat ? 1 : 0; // Jika export, semua index geser 1 karena ada kolom "No."
+            
+            $nama       = trim($data[$idx] ?? '');
+            $opd        = trim($data[$idx + 1] ?? '');
+            $status     = trim($data[$idx + 2] ?? '');
+            $no_surat   = trim($data[$idx + 3] ?? '');
+            $perihal    = trim($data[$idx + 4] ?? '');
+            $no_sk      = trim($data[$idx + 5] ?? '');
+            $user_id    = trim($data[$idx + 6] ?? '');
+            
+            // Hapus tanda petik otomatis satu ' jika berasal dari file export
+            $nik        = ltrim(trim($data[$idx + 7] ?? ''), "'");
+            $nip        = ltrim(trim($data[$idx + 8] ?? ''), "'");
+            $pangkat    = trim($data[$idx + 9] ?? '');
+            $jabatan    = trim($data[$idx + 10] ?? '');
+            $no_hp      = ltrim(trim($data[$idx + 11] ?? ''), "'");
+            $alamat     = trim($data[$idx + 12] ?? '');
+            $sumber     = trim($data[$idx + 13] ?? 'Digital');
+            $jenis_data = trim($data[$idx + 14] ?? 'Katalog v.6');
+            $rawTanggal = trim($data[$idx + 15] ?? '');
+
+            // Pengecekan dibuat SANGAT KETAT hanya berdasarkan User ID
+            $exists = InaprocAccount::where('user_id', $user_id)->exists();
 
             if ($exists) {
+                // Simpan user_id yang gagal karena duplikat
+                if (!empty($user_id)) {
+                    $skippedUserIds[] = $user_id;
+                }
                 continue;
             }
 
             // --- LOGIKA KONVERSI TANGGAL MAS ROBI ---
             $tanggalDaftar = null;
-            if (!empty($data[15])) {
+            if (!empty($rawTanggal)) {
                 try {
-                    // Mengubah format 13/01/2026 menjadi format database 2026-01-13
-                    $tanggalDaftar = Carbon::createFromFormat('d/m/Y', trim($data[15]))->format('Y-m-d');
+                    // Beberapa versi PHP/Excel bisa mengubah / menjadi -
+                    $rawTanggal = str_replace('-', '/', $rawTanggal);
+                    $tanggalDaftar = Carbon::createFromFormat('d/m/Y', $rawTanggal)->format('Y-m-d');
                 } catch (\Exception $e) {
-                    // Jika formatnya aneh/salah, pakai tanggal hari ini
                     $tanggalDaftar = date('Y-m-d');
                 }
             } else {
@@ -510,28 +541,36 @@ public function exportPdf(Request $request)
             // ----------------------------------------
 
             InaprocAccount::create([
-                'nama'               => $data[0],
-                'opd'                => $data[1],
-                'status'             => $data[2],
-                'no_surat_permohonan'=> $data[3],
-                'perihal_permohonan' => $data[4],
-                'no_sk'              => $data[5],
-                'user_id'            => $data[6],
-                'nik'                => $data[7],
-                'nip'                => $data[8],
-                'pangkat_gol'        => $data[9],
-                'jabatan'            => $data[10],
-                'no_hp'              => $data[11],
-                'alamat'             => $data[12],
-                'sumber'             => $data[13] ?? 'Digital',
-                'jenis_data'         => $data[14] ?? 'Katalog v.6',
-                'tanggal_daftar'     => $tanggalDaftar, // Pakai variabel yang sudah dikonversi
+                'nama'               => $nama,
+                'opd'                => $opd,
+                'status'             => $status,
+                'no_surat_permohonan'=> $no_surat,
+                'perihal_permohonan' => $perihal,
+                'no_sk'              => $no_sk,
+                'user_id'            => $user_id,
+                'nik'                => $nik,
+                'nip'                => $nip,
+                'pangkat_gol'        => $pangkat,
+                'jabatan'            => $jabatan,
+                'no_hp'              => $no_hp,
+                'alamat'             => $alamat,
+                'sumber'             => $sumber,
+                'jenis_data'         => $jenis_data,
+                'tanggal_daftar'     => $tanggalDaftar,
             ]);
             $count++;
         }
 
         fclose($handle);
-        return back()->with('success', "Berhasil mengimport $count data Inaproc!");
+        
+        $response = back()->with('success', "Berhasil mengimport $count data Inaproc!");
+        
+        // Jika ada data yang terlewat karena duplikat
+        if (count($skippedUserIds) > 0) {
+            $response->with('error', 'Gagal memproses beberapa akun karena User ID sudah terdaftar: ' . implode(', ', $skippedUserIds));
+        }
+        
+        return $response;
     }
 
     public function downloadTemplate()

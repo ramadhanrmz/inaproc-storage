@@ -283,7 +283,7 @@
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                                 </a>
 
-                                <form action="{{ route('inaproc-accounts.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Apakah Mas Robi yakin ingin menghapus data ini?')">
+                                <form action="{{ route('inaproc-accounts.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Apakah yakin ingin menghapus data ini?')">
                                     @csrf @method('DELETE')
                                     <button type="submit" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-rose-100 text-rose-600 hover:bg-rose-600 hover:text-white transition-all">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
@@ -325,6 +325,25 @@
 </div>
 @endif
 
+{{-- MODAL NOTIFIKASI ERROR (Duplikat CSV) --}}
+@if(session('error'))
+<div id="error-modal-overlay" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[9999] flex items-center justify-center transition-opacity duration-300">
+    <div id="error-modal" class="bg-white rounded-2xl shadow-2xl p-8 max-w-lg w-full mx-4 text-center transform scale-95 opacity-0 transition-all duration-300">
+        {{-- Icon Error --}}
+        <div class="mx-auto w-20 h-20 rounded-full bg-red-100 flex items-center justify-center mb-5">
+            <svg class="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+        </div>
+        <h3 class="text-xl font-black text-gray-800 mb-2">Proses Import Selesai dengan Catatan</h3>
+        <p class="text-sm text-gray-500 mb-4 bg-red-50 p-4 rounded-xl text-left font-mono break-words leading-relaxed max-h-40 overflow-y-auto">{{ session('error') }}</p>
+        <button onclick="closeErrorModal()" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2.5 px-6 rounded-xl transition-colors shadow-lg shadow-red-100">
+            Tutup
+        </button>
+    </div>
+</div>
+@endif
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const searchInput = document.getElementById('search-input');
@@ -343,7 +362,7 @@
         searchInput.focus();
         searchInput.value = val;
 
-        // Animasi Modal Sukses
+        // Animasi Modal Sukses & Error
         const successModal = document.getElementById('success-modal');
         if (successModal) {
             setTimeout(() => {
@@ -351,11 +370,28 @@
                 successModal.classList.add('scale-100', 'opacity-100');
             }, 50);
         }
+
+        const errorModal = document.getElementById('error-modal');
+        if (errorModal) {
+            setTimeout(() => {
+                errorModal.classList.remove('scale-95', 'opacity-0');
+                errorModal.classList.add('scale-100', 'opacity-100');
+            }, 50);
+        }
     });
 
     function closeSuccessModal() {
         const modal = document.getElementById('success-modal');
         const overlay = document.getElementById('success-modal-overlay');
+        modal.classList.remove('scale-100', 'opacity-100');
+        modal.classList.add('scale-95', 'opacity-0');
+        overlay.classList.add('opacity-0');
+        setTimeout(() => overlay.remove(), 300);
+    }
+    
+    function closeErrorModal() {
+        const modal = document.getElementById('error-modal');
+        const overlay = document.getElementById('error-modal-overlay');
         modal.classList.remove('scale-100', 'opacity-100');
         modal.classList.add('scale-95', 'opacity-0');
         overlay.classList.add('opacity-0');
