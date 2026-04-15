@@ -477,6 +477,23 @@ public function exportPdf(Request $request)
         $count = 0;
         while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
             
+            // Skip baris kosong (misal akibat enter tambahan di akhir file)
+            if (empty(array_filter($data))) {
+                continue;
+            }
+
+            // Cek duplikasi, skip jika data sudah ada di database
+            // Kita cek berdasarkan NIK, User ID, Status, dan Jenis Data
+            $exists = InaprocAccount::where('nik', $data[7] ?? '')
+                        ->where('user_id', $data[6] ?? '')
+                        ->where('status', $data[2] ?? '')
+                        ->where('jenis_data', $data[14] ?? 'Katalog v.6')
+                        ->exists();
+
+            if ($exists) {
+                continue;
+            }
+
             // --- LOGIKA KONVERSI TANGGAL MAS ROBI ---
             $tanggalDaftar = null;
             if (!empty($data[15])) {

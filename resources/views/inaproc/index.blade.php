@@ -3,31 +3,31 @@
 @section('content')
 <div class="space-y-6">
     {{-- HEADER SECTION --}}
-    <div class="flex justify-between items-center bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-        <div class="flex items-center space-x-4">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Coat_of_arms_of_West_Nusa_Tenggara.svg/500px-Coat_of_arms_of_West_Nusa_Tenggara.svg.png" class="h-14 w-auto" alt="Logo">
+    <div class="flex flex-col md:flex-row justify-between items-center bg-white p-4 md:p-6 rounded-xl shadow-sm border border-gray-100 gap-4">
+        <div class="flex flex-col md:flex-row items-center space-y-3 md:space-y-0 md:space-x-4 text-center md:text-left">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Coat_of_arms_of_West_Nusa_Tenggara.svg/500px-Coat_of_arms_of_West_Nusa_Tenggara.svg.png" class="h-12 md:h-14 w-auto" alt="Logo">
             <div>
-                <h1 class="text-2xl font-black text-blue-800 uppercase tracking-tight">Manajemen Akun Inaproc</h1>
-                <p class="text-xs text-gray-400 font-bold uppercase tracking-widest">LPSE Provinsi Nusa Tenggara Barat</p>
+                <h1 class="text-xl md:text-2xl font-black text-blue-800 uppercase tracking-tight">Manajemen Akun Inaproc</h1>
+                <p class="text-[10px] md:text-xs text-gray-400 font-bold uppercase tracking-widest mt-1">LPSE Provinsi Nusa Tenggara Barat</p>
             </div>
         </div>
-        <div class="flex items-center space-x-3">
+        <div class="flex flex-wrap justify-center items-center gap-2">
             {{-- Tombol Grafik --}}
-            <a href="{{ route('inaproc.grafik') }}" class="inline-flex items-center justify-center bg-indigo-600 hover:bg-indigo-700 text-white h-10 px-6 rounded-lg shadow-md shadow-indigo-100 transition-all font-bold text-sm">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+            <a href="{{ route('inaproc.grafik') }}" class="inline-flex items-center justify-center bg-indigo-600 hover:bg-indigo-700 text-white h-10 px-4 md:px-6 rounded-lg shadow-md shadow-indigo-100 transition-all font-bold text-xs md:text-sm">
+                <svg class="w-4 h-4 mr-1 md:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
                 Grafik
             </a>
 
             {{-- Tombol Tambah Data Modern --}}
-            <a href="{{ route('inaproc-accounts.create') }}" class="inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white h-10 px-6 rounded-lg shadow-md shadow-blue-100 transition-all font-bold text-sm">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            <a href="{{ route('inaproc-accounts.create') }}" class="inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white h-10 px-4 md:px-6 rounded-lg shadow-md shadow-blue-100 transition-all font-bold text-xs md:text-sm">
+                <svg class="w-4 h-4 mr-1 md:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                 Tambah Data
             </a>
             
             {{-- Form Logout Modern --}}
             <form method="POST" action="{{ route('logout') }}" class="m-0">
                 @csrf
-                <button type="submit" class="inline-flex items-center justify-center bg-white text-red-600 border border-red-200 h-10 px-6 rounded-lg text-sm font-bold hover:bg-red-50 transition-colors">
+                <button type="submit" class="inline-flex items-center justify-center bg-white text-red-600 border border-red-200 h-10 px-4 md:px-6 rounded-lg text-xs md:text-sm font-bold hover:bg-red-50 transition-colors">
                     Logout
                 </button>
             </form>
@@ -101,74 +101,78 @@
         </div>
     </div>
 
-    {{-- FILTER SECTION --}}
-    {{-- Ganti bagian tombol Export PDF di index.blade.php dengan ini --}}
-    <div class="flex items-center gap-2">
-        {{-- Tombol Export PDF --}}
-        <div class="relative inline-block group">
-            <button type="button" class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg text-xs font-bold flex items-center transition shadow-sm">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                </svg>
-                Export PDF
-            </button>
-            
-            <!-- Dropdown Menu -->
-            <div class="absolute left-0 w-48 mt-2 origin-top-left bg-white border border-gray-100 divide-y divide-gray-50 rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[999]">
-                <div class="py-2">
-                    <a href="{{ route('inaproc.export-pdf', array_merge(request()->query(), ['jenis' => 'Katalog v.6'])) }}" target="_blank" class="flex items-center px-4 py-2 text-xs text-gray-700 hover:bg-blue-50 hover:text-blue-700 font-bold transition">
-                        📄 Katalog v.6
-                    </a>
-                    <a href="{{ route('inaproc.export-pdf', array_merge(request()->query(), ['jenis' => 'SPSE'])) }}" target="_blank" class="flex items-center px-4 py-2 text-xs text-gray-700 hover:bg-blue-50 hover:text-blue-700 font-bold transition">
-                        📄 SPSE
-                    </a>
+    {{-- FILTER & ACTION BUTTONS SECTION --}}
+    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 py-2">
+        {{-- TOMBOL AKSI --}}
+        <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
+            {{-- Tombol Export PDF --}}
+            <div class="relative inline-block group">
+                <button type="button" class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg text-xs font-bold flex items-center transition shadow-sm w-full justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                    </svg>
+                    Export PDF
+                </button>
+                
+                <!-- Dropdown Menu -->
+                <div class="absolute left-0 w-48 mt-2 origin-top-left bg-white border border-gray-100 divide-y divide-gray-50 rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[999]">
+                    <div class="py-2">
+                        <a href="{{ route('inaproc.export-pdf', array_merge(request()->query(), ['jenis' => 'Katalog v.6'])) }}" target="_blank" class="flex items-center px-4 py-2 text-xs text-gray-700 hover:bg-blue-50 hover:text-blue-700 font-bold transition">
+                            📄 Katalog v.6
+                        </a>
+                        <a href="{{ route('inaproc.export-pdf', array_merge(request()->query(), ['jenis' => 'SPSE'])) }}" target="_blank" class="flex items-center px-4 py-2 text-xs text-gray-700 hover:bg-blue-50 hover:text-blue-700 font-bold transition">
+                            📄 SPSE
+                        </a>
+                    </div>
                 </div>
             </div>
+
+            {{-- TOMBOL EXPORT CSV --}}
+            <a href="{{ route('inaproc.export-csv', request()->query()) }}" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-xs font-bold flex items-center transition shadow-sm w-full sm:w-auto justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                Export CSV
+            </a>
+
+            {{-- TOMBOL IMPORT CSV BARU --}}
+            <form action="{{ route('inaproc.import') }}" method="POST" enctype="multipart/form-data" class="flex items-center w-full sm:w-auto">
+                @csrf
+                <input type="file" name="csv_file" id="csv_file" class="hidden" onchange="this.form.submit()" accept=".csv">
+                <button type="button" onclick="document.getElementById('csv_file').click()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-xs font-bold flex items-center transition shadow-sm w-full justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                    </svg>
+                    Import CSV
+                </button>
+            </form>
+
+            {{-- Tombol Download Template --}}
+            <a href="{{ route('inaproc.download-template') }}" class="bg-slate-100 hover:bg-slate-200 text-slate-600 px-4 py-2 rounded-lg text-xs font-bold flex items-center transition border border-slate-200 w-full sm:w-auto justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                Download Template
+            </a>
         </div>
 
-        {{-- TOMBOL EXPORT CSV --}}
-        <a href="{{ route('inaproc.export-csv', request()->query()) }}" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-xs font-bold flex items-center transition shadow-sm">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-            Export CSV
-        </a>
-
-        {{-- TOMBOL IMPORT CSV BARU --}}
-        <form action="{{ route('inaproc.import') }}" method="POST" enctype="multipart/form-data" class="flex items-center">
-            @csrf
-            <input type="file" name="csv_file" id="csv_file" class="hidden" onchange="this.form.submit()" accept=".csv">
-            <button type="button" onclick="document.getElementById('csv_file').click()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-xs font-bold flex items-center transition shadow-sm">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                </svg>
-                Import CSV
-            </button>
-        </form>
-
-        {{-- Tombol Download Template --}}
-        <a href="{{ route('inaproc.download-template') }}" class="bg-slate-100 hover:bg-slate-200 text-slate-600 px-4 py-2 rounded-lg text-xs font-bold flex items-center transition border border-slate-200">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-            </svg>
-            Download Template
-        </a>
-    </div>
-
-        <form id="auto-filter-form" action="{{ route('inaproc-accounts.index') }}" method="GET" class="flex flex-wrap items-center gap-3">
-            <div class="flex items-center gap-1 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-200">
-                <span class="text-[10px] font-black text-gray-400 uppercase mr-1">Rentang :</span>
-                <select name="start_month" onchange="this.form.submit()" class="bg-transparent border-none text-xs font-bold text-gray-600 focus:ring-0 cursor-pointer p-0 w-24">
-                    <option value="">Semua Bulan</option>
-                    @for($i=1; $i<=12; $i++)
-                        <option value="{{$i}}" {{ request('start_month') == $i ? 'selected' : '' }}>{{ date('M', mktime(0,0,0,$i,1)) }}</option>
-                    @endfor
-                </select>
-                <span class="text-xs text-gray-400 font-bold">-</span>
-                <select name="end_month" onchange="this.form.submit()" class="bg-transparent border-none text-xs font-bold text-gray-600 focus:ring-0 cursor-pointer p-0 w-24 ml-1">
-                    <option value="">Semua Bulan</option>
-                    @for($i=1; $i<=12; $i++)
-                        <option value="{{$i}}" {{ request('end_month') == $i ? 'selected' : '' }}>{{ date('M', mktime(0,0,0,$i,1)) }}</option>
-                    @endfor
-                </select>
+        {{-- FILTER FORM --}}
+        <form id="auto-filter-form" action="{{ route('inaproc-accounts.index') }}" method="GET" class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
+            <div class="flex flex-wrap items-center gap-1 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-200">
+                <span class="text-[10px] font-black text-gray-400 uppercase mr-1 w-full sm:w-auto">Rentang:</span>
+                <div class="flex items-center gap-1">
+                    <select name="start_month" onchange="this.form.submit()" class="bg-transparent border-none text-xs font-bold text-gray-600 focus:ring-0 cursor-pointer p-0">
+                        <option value="">Semua Bulan</option>
+                        @for($i=1; $i<=12; $i++)
+                            <option value="{{$i}}" {{ request('start_month') == $i ? 'selected' : '' }}>{{ date('M', mktime(0,0,0,$i,1)) }}</option>
+                        @endfor
+                    </select>
+                    <span class="text-xs text-gray-400 font-bold">-</span>
+                    <select name="end_month" onchange="this.form.submit()" class="bg-transparent border-none text-xs font-bold text-gray-600 focus:ring-0 cursor-pointer p-0 ml-1">
+                        <option value="">Semua Bulan</option>
+                        @for($i=1; $i<=12; $i++)
+                            <option value="{{$i}}" {{ request('end_month') == $i ? 'selected' : '' }}>{{ date('M', mktime(0,0,0,$i,1)) }}</option>
+                        @endfor
+                    </select>
+                </div>
             </div>
 
             <div class="flex items-center bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-200">
@@ -196,22 +200,21 @@
 
     {{-- TABLE SECTION --}}
     <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mt-4">
-        <div class="p-4 border-b border-gray-50 flex flex-wrap justify-between items-center gap-4">
-            <div class="flex items-center space-x-4">
-                <div class="flex items-center space-x-2">
+        <div class="p-4 border-b border-gray-50 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div class="flex flex-wrap items-center gap-2 lg:gap-4 w-full md:w-auto">
+                <div class="flex items-center space-x-2 bg-gray-50 px-2 py-1.5 rounded-lg border border-gray-200">
                     <span class="text-[10px] font-black text-gray-400 uppercase">Show:</span>
-                    <select name="per_page" form="auto-filter-form" onchange="this.form.submit()" class="border-gray-200 rounded-lg text-xs font-bold p-1 focus:ring-blue-500">
+                    <select name="per_page" form="auto-filter-form" onchange="this.form.submit()" class="bg-transparent border-none text-xs font-bold p-0 pr-6 focus:ring-0">
                         <option value="10" {{ request('per_page') == '10' ? 'selected' : '' }}>10</option>
                         <option value="50" {{ request('per_page') == '50' ? 'selected' : '' }}>50</option>
                         <option value="semua" {{ request('per_page') == 'semua' ? 'selected' : '' }}>Semua</option>
                     </select>
                 </div>
 
-                {{-- FILTER JENIS DATA YANG TADI HILANG --}}
-                <div class="flex items-center space-x-2 border-l border-gray-100 pl-4">
+                <div class="flex items-center space-x-2 bg-blue-50 px-2 py-1.5 rounded-lg border border-blue-100">
                     <span class="text-[10px] font-black text-gray-400 uppercase">Jenis Data:</span>
                     <select name="jenis_filter" form="auto-filter-form" onchange="this.form.submit()" 
-                            class="border-gray-200 rounded-lg text-xs font-black text-blue-700 p-1 focus:ring-blue-500 bg-blue-50/50">
+                            class="bg-transparent border-none text-xs font-black text-blue-700 p-0 pr-6 focus:ring-0">
                         <option value="">Semua</option>
                         <option value="Katalog v.6" {{ request('jenis_filter') == 'Katalog v.6' ? 'selected' : '' }}>Katalog v.6</option>
                         <option value="SPSE" {{ request('jenis_filter') == 'SPSE' ? 'selected' : '' }}>SPSE</option>
@@ -219,16 +222,16 @@
                 </div>
             </div>
             
-            <div class="relative">
+            <div class="relative w-full md:w-auto">
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3">
                     <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                 </span>
-                <input type="text" id="search-input" name="search" form="auto-filter-form" value="{{ request('search') }}" placeholder="Cari nama/OPD..." autocomplete="off" class="pl-10 pr-4 py-2 border-gray-200 rounded-xl text-xs font-bold w-64 focus:ring-blue-500 focus:border-blue-500 bg-gray-50/50">
+                <input type="text" id="search-input" name="search" form="auto-filter-form" value="{{ request('search') }}" placeholder="Cari nama/OPD..." autocomplete="off" class="pl-10 pr-4 py-2 border border-gray-200 rounded-xl text-xs font-bold w-full md:w-64 focus:ring-blue-500 focus:border-blue-500 bg-gray-50/50">
             </div>
         </div>
 
         <div class="overflow-x-auto">
-            <table class="w-full text-left">
+            <table class="w-full text-left min-w-[800px]">
                 <thead>
                     <tr class="bg-gray-50/50 text-gray-400 uppercase text-[10px] font-black tracking-widest border-b border-gray-100">
                         <th class="p-4 text-center">No</th>
