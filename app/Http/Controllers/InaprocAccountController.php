@@ -525,12 +525,24 @@ public function exportPdf(Request $request)
             $exists = false;
             if (strtoupper($status) !== 'PP') {
                 $exists = InaprocAccount::where('user_id', $user_id)->exists();
+            } else {
+                // Untuk PP: boleh duplikat user_id dan nama antar OPD yang berbeda.
+                // Jika user_id sama DAN opd sama, maka dianggap duplikat (tidak boleh).
+                // Jika user_id berbeda TETAPI opd sama, maka BOLEH (jangan dianggap duplikat).
+                $exists = InaprocAccount::where('status', 'PP')
+                                        ->where('user_id', $user_id)
+                                        ->where('opd', $opd)
+                                        ->exists();
             }
 
             if ($exists) {
-                // Simpan user_id yang gagal karena duplikat
+                // Simpan keterangan yang gagal karena duplikat
                 if (!empty($user_id)) {
-                    $skippedUserIds[] = $user_id;
+                    if (strtoupper($status) === 'PP') {
+                        $skippedUserIds[] = $user_id . ' (OPD: ' . $opd . ')';
+                    } else {
+                        $skippedUserIds[] = $user_id;
+                    }
                 }
                 continue;
             }
