@@ -6,6 +6,10 @@ use App\Models\InaprocAccount;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class InaprocAccountController extends Controller
 {
@@ -379,7 +383,7 @@ public function exportPdf(Request $request)
         return $pdf->stream("Rekapitulasi_{$jenis}.pdf");
     }
 
-    public function exportCsv(Request $request)
+    public function exportXlsx(Request $request)
     {
         $search = $request->get('search');
         $statusFilter = $request->get('status_filter');
@@ -420,60 +424,85 @@ public function exportPdf(Request $request)
 
         $data = $query->orderBy('tanggal_daftar', 'desc')->orderBy('id', 'desc')->get();
 
-        $filename = "Rekapitulasi_Inaproc_" . date('Y-m-d') . ".csv";
-        $headers = [
-            "Content-type"        => "text/csv",
-            "Content-Disposition" => "attachment; filename=$filename",
-            "Pragma"              => "no-cache",
-            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
-            "Expires"             => "0"
-        ];
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Data Inaproc');
 
+        // Header kolom
         $columns = [
             'No.', 'Nama Lengkap', 'Perangkat Daerah', 'Status', 'No. Surat Permohonan', 'Perihal Permohonan', 
             'No SK', 'User ID', 'NIK', 'NIP', 'Pangkat/Gol', 'Jabatan', 
             'No. WhatsApp', 'Alamat', 'Sumber Data', 'Jenis Data', 'Tanggal Aktif'
         ];
 
-        $callback = function() use($data, $columns) {
-            $file = fopen('php://output', 'w');
-            fputcsv($file, $columns);
-            
-            $no = 1;
-            foreach ($data as $row) {
-                fputcsv($file, [
-                    $no++,
-                    $row->nama,
-                    $row->opd,
-                    $row->status,
-                    $row->no_surat_permohonan,
-                    $row->perihal_permohonan,
-                    $row->no_sk,
-                    $row->user_id,
-                    "'" . $row->nik, // Format teks agar angka panjang tidak berantakan di Excel
-                    "'" . $row->nip,
-                    $row->pangkat_gol,
-                    $row->jabatan,
-                    "'" . $row->no_hp,
-                    $row->alamat,
-                    $row->sumber,
-                    $row->jenis_data,
-                    \Carbon\Carbon::parse($row->tanggal_daftar)->format('d/m/Y')
-                ]);
-            }
-            fclose($file);
-        };
+        // Tulis header dengan styling
+        $colLetters = range('A', 'Q');
+        foreach ($columns as $colIdx => $colName) {
+            $cellRef = $colLetters[$colIdx] . '1';
+            $sheet->setCellValue($cellRef, $colName);
+            $sheet->getStyle($cellRef)->getFont()->setBold(true);
+        }
 
-        return response()->stream($callback, 200, $headers);
+        // Set kolom NIK (I), NIP (J), No HP (M) sebagai format TEKS agar tidak jadi scientific notation
+        $sheet->getStyle('I:I')->getNumberFormat()->setFormatCode('@');
+        $sheet->getStyle('J:J')->getNumberFormat()->setFormatCode('@');
+        $sheet->getStyle('M:M')->getNumberFormat()->setFormatCode('@');
+
+        // Tulis data
+        $rowNum = 2;
+        $no = 1;
+        foreach ($data as $row) {
+            $sheet->setCellValue("A{$rowNum}", $no++);
+            $sheet->setCellValue("B{$rowNum}", $row->nama);
+            $sheet->setCellValue("C{$rowNum}", $row->opd);
+            $sheet->setCellValue("D{$rowNum}", $row->status);
+            $sheet->setCellValue("E{$rowNum}", $row->no_surat_permohonan);
+            $sheet->setCellValue("F{$rowNum}", $row->perihal_permohonan);
+            $sheet->setCellValue("G{$rowNum}", $row->no_sk);
+            $sheet->setCellValue("H{$rowNum}", $row->user_id);
+            // NIK, NIP, No HP ditulis sebagai STRING eksplisit agar angka panjang tidak berubah
+            $sheet->setCellValueExplicit("I{$rowNum}", $row->nik, DataType::TYPE_STRING);
+            $sheet->setCellValueExplicit("J{$rowNum}", $row->nip, DataType::TYPE_STRING);
+            $sheet->setCellValue("K{$rowNum}", $row->pangkat_gol);
+            $sheet->setCellValue("L{$rowNum}", $row->jabatan);
+            $sheet->setCellValueExplicit("M{$rowNum}", $row->no_hp, DataType::TYPE_STRING);
+            $sheet->setCellValue("N{$rowNum}", $row->alamat);
+            $sheet->setCellValue("O{$rowNum}", $row->sumber);
+            $sheet->setCellValue("P{$rowNum}", $row->jenis_data);
+            $sheet->setCellValue("Q{$rowNum}", Carbon::parse($row->tanggal_daftar)->format('d/m/Y'));
+            $rowNum++;
+        }
+
+        // Auto-size kolom untuk kerapian
+        foreach (range('A', 'Q') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        $filename = "Rekapitulasi_Inaproc_" . date('Y-m-d') . ".xlsx";
+        $tempFile = tempnam(sys_get_temp_dir(), 'xlsx_');
+        $writer = new Xlsx($spreadsheet);
+        $writer->save($tempFile);
+
+        return response()->download($tempFile, $filename, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        ])->deleteFileAfterSend(true);
     }
 
     public function import(Request $request)
     {
         $request->validate([
-            'csv_file' => 'required|mimes:csv,txt',
+            'csv_file' => 'required|file',
         ]);
 
         $file = $request->file('csv_file');
+        $ext = strtolower($file->getClientOriginalExtension());
+
+        // Jika file XLSX, gunakan PhpSpreadsheet untuk membaca
+        if ($ext === 'xlsx' || $ext === 'xls') {
+            return $this->importFromXlsx($file);
+        }
+
+        // Jika CSV/TXT, gunakan logika lama
         $handle = fopen($file->getRealPath(), "r");
         
         $header = fgetcsv($handle); 
@@ -503,22 +532,54 @@ public function exportPdf(Request $request)
             $no_sk      = trim($data[$idx + 5] ?? '');
             $user_id    = trim($data[$idx + 6] ?? '');
             
-            // Hapus tanda petik otomatis satu ' jika berasal dari file export
-            $nik        = ltrim(trim($data[$idx + 7] ?? ''), "'");
-            $nip        = ltrim(trim($data[$idx + 8] ?? ''), "'");
+            // Bersihkan tanda petik (') dan format ="value" dari NIK, NIP, No HP
+            $nik        = trim($data[$idx + 7] ?? '');
+            $nip        = trim($data[$idx + 8] ?? '');
             $pangkat    = trim($data[$idx + 9] ?? '');
             $jabatan    = trim($data[$idx + 10] ?? '');
-            $no_hp      = ltrim(trim($data[$idx + 11] ?? ''), "'");
+            $rawNoHp    = trim($data[$idx + 11] ?? '');
             $alamat     = trim($data[$idx + 12] ?? '');
             $sumber     = trim($data[$idx + 13] ?? 'Digital');
             $jenis_data = trim($data[$idx + 14] ?? 'Katalog v.6');
             $rawTanggal = trim($data[$idx + 15] ?? '');
 
-            // Formatter untuk Nomor HP otomatis 62
+            // Helper: bersihkan format ="value", tanda petik, dan scientific notation
+            // Contoh: ="5201234567890123" -> 5201234567890123
+            // Contoh: '5201234567890123 -> 5201234567890123
+            // Contoh: 5.27E+15 -> 5270000000000000 (presisi hilang dari Excel)
+            $cleanNumericField = function($val) {
+                $val = trim($val);
+                // Handle format Excel ="value"
+                if (preg_match('/^="?(.+?)"?$/', $val, $m)) {
+                    $val = $m[1];
+                }
+                // Hapus tanda petik di awal/akhir
+                $val = trim($val, "'\"=");
+                // Handle scientific notation (mis: 5.27E+15, 1.99E+17)
+                if (preg_match('/^[\d.]+[eE][+\-]?\d+$/', $val)) {
+                    $val = sprintf('%.0f', (float)$val);
+                }
+                // Hanya ambil angka murni
+                return preg_replace('/[^0-9]/', '', $val);
+            };
+
+            $nik = $cleanNumericField($nik);
+            $nip = $cleanNumericField($nip);
+            $rawNoHp = $cleanNumericField($rawNoHp);
+
+            // Formatter untuk Nomor HP: normalisasi ke format 62 + 11 digit mulai dari angka 8
+            $no_hp = $rawNoHp; // Sudah dibersihkan oleh $cleanNumericField
+            if (str_starts_with($no_hp, '62')) {
+                $no_hp = substr($no_hp, 2); // Hapus prefix 62 dulu
+            }
             if (str_starts_with($no_hp, '0')) {
-                $no_hp = '62' . substr($no_hp, 1);
-            } elseif (str_starts_with($no_hp, '8')) {
-                $no_hp = '62' . $no_hp;
+                $no_hp = substr($no_hp, 1); // Hapus angka 0 di depan
+            }
+            // Pastikan dimulai dari angka 8, ambil 11 digit
+            if (str_starts_with($no_hp, '8')) {
+                $no_hp = '62' . substr($no_hp, 0, 11);
+            } elseif (!empty($no_hp)) {
+                $no_hp = '62' . $no_hp; // Fallback jika format tidak dikenali
             }
 
             // Pengecekan dibuat SANGAT KETAT hanya berdasarkan User ID, kecuali untuk status PP
@@ -597,35 +658,194 @@ public function exportPdf(Request $request)
 
     public function downloadTemplate()
     {
-        $headers = [
-            "Content-type"        => "text/csv",
-            "Content-Disposition" => "attachment; filename=template_akun_inaproc.csv",
-            "Pragma"              => "no-cache",
-            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
-            "Expires"             => "0"
-        ];
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Template Import');
 
-        // Kolom sesuai urutan database Mas Robi
+        // Kolom sesuai urutan database
         $columns = [
             'nama', 'opd', 'status', 'no_surat_permohonan', 'perihal_permohonan', 
             'no_sk', 'user_id', 'nik', 'nip', 'pangkat_gol', 'jabatan', 
             'no_hp', 'alamat', 'sumber', 'jenis_data', 'tanggal_daftar'
         ];
 
-        $callback = function() use($columns) {
-            $file = fopen('php://output', 'w');
-            fputcsv($file, $columns);
+        // Tulis header
+        $colLetters = range('A', 'P');
+        foreach ($columns as $colIdx => $colName) {
+            $cellRef = $colLetters[$colIdx] . '1';
+            $sheet->setCellValue($cellRef, $colName);
+            $sheet->getStyle($cellRef)->getFont()->setBold(true);
+        }
 
-            // Berikan satu contoh data dummy agar Mas Robi tidak bingung cara isinya
-            fputcsv($file, [
-                'Nama Lengkap Contoh', 'Biro Pengadaan', 'PPK', '001/SRT/2026', 'Permohonan Akun', 
-                '821.29/123/2026', 'USERID_CONTOH', '520123456789', '19930304202301', 'Penata - III/c', 'Pranata Komputer', 
-                '08123456789', 'Jl. Pejanggik No. 1', 'Digital', 'Katalog v.6', '2026-04-12'
-            ]);
-            
-            fclose($file);
+        // Set kolom NIK (H), NIP (I), No HP (L) sebagai teks (format template tanpa kolom No.)
+        $sheet->getStyle('H:H')->getNumberFormat()->setFormatCode('@');
+        $sheet->getStyle('I:I')->getNumberFormat()->setFormatCode('@');
+        $sheet->getStyle('L:L')->getNumberFormat()->setFormatCode('@');
+
+        // Contoh data dummy
+        $sheet->setCellValue('A2', 'Nama Lengkap Contoh');
+        $sheet->setCellValue('B2', 'Biro Pengadaan');
+        $sheet->setCellValue('C2', 'PPK');
+        $sheet->setCellValue('D2', '001/SRT/2026');
+        $sheet->setCellValue('E2', 'Permohonan Akun');
+        $sheet->setCellValue('F2', '821.29/123/2026');
+        $sheet->setCellValue('G2', 'USERID_CONTOH');
+        $sheet->setCellValueExplicit('H2', '5201234567890123', DataType::TYPE_STRING);
+        $sheet->setCellValueExplicit('I2', '199303042023011001', DataType::TYPE_STRING);
+        $sheet->setCellValue('J2', 'Penata - III/c');
+        $sheet->setCellValue('K2', 'Pranata Komputer');
+        $sheet->setCellValueExplicit('L2', '08123456789', DataType::TYPE_STRING);
+        $sheet->setCellValue('M2', 'Jl. Pejanggik No. 1');
+        $sheet->setCellValue('N2', 'Digital');
+        $sheet->setCellValue('O2', 'Katalog v.6');
+        $sheet->setCellValue('P2', '12/04/2026');
+
+        // Auto-size
+        foreach (range('A', 'P') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        $tempFile = tempnam(sys_get_temp_dir(), 'tmpl_');
+        $writer = new Xlsx($spreadsheet);
+        $writer->save($tempFile);
+
+        return response()->download($tempFile, 'template_akun_inaproc.xlsx', [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        ])->deleteFileAfterSend(true);
+    }
+
+    /**
+     * Import data dari file XLSX menggunakan PhpSpreadsheet
+     */
+    private function importFromXlsx($file)
+    {
+        $spreadsheet = IOFactory::load($file->getRealPath());
+        $sheet = $spreadsheet->getActiveSheet();
+        $rows = $sheet->toArray(null, true, true, false);
+
+        if (empty($rows)) {
+            return back()->with('error', 'File XLSX kosong.');
+        }
+
+        // Ambil header dan deteksi format
+        $header = array_shift($rows);
+        $firstCol = strtolower(trim($header[0] ?? ''));
+        $isExportFormat = ($firstCol === 'no.' || $firstCol === 'no');
+
+        $count = 0;
+        $skippedUserIds = [];
+
+        // Helper: bersihkan nilai numerik
+        $cleanNumericField = function($val) {
+            $val = trim((string)$val);
+            if (preg_match('/^="?(.+?)"?$/', $val, $m)) {
+                $val = $m[1];
+            }
+            $val = trim($val, "'\"=");
+            if (preg_match('/^[\d.]+[eE][+\-]?\d+$/', $val)) {
+                $val = sprintf('%.0f', (float)$val);
+            }
+            return preg_replace('/[^0-9]/', '', $val);
         };
 
-        return response()->stream($callback, 200, $headers);
+        foreach ($rows as $data) {
+            if (empty(array_filter($data))) {
+                continue;
+            }
+
+            $idx = $isExportFormat ? 1 : 0;
+
+            $nama       = trim((string)($data[$idx] ?? ''));
+            $opd        = trim((string)($data[$idx + 1] ?? ''));
+            $status     = trim((string)($data[$idx + 2] ?? ''));
+            $no_surat   = trim((string)($data[$idx + 3] ?? ''));
+            $perihal    = trim((string)($data[$idx + 4] ?? ''));
+            $no_sk      = trim((string)($data[$idx + 5] ?? ''));
+            $user_id    = trim((string)($data[$idx + 6] ?? ''));
+            $nik        = $cleanNumericField($data[$idx + 7] ?? '');
+            $nip        = $cleanNumericField($data[$idx + 8] ?? '');
+            $pangkat    = trim((string)($data[$idx + 9] ?? ''));
+            $jabatan    = trim((string)($data[$idx + 10] ?? ''));
+            $rawNoHp    = $cleanNumericField($data[$idx + 11] ?? '');
+            $alamat     = trim((string)($data[$idx + 12] ?? ''));
+            $sumber     = trim((string)($data[$idx + 13] ?? '')) ?: 'Digital';
+            $jenis_data = trim((string)($data[$idx + 14] ?? '')) ?: 'Katalog v.6';
+            $rawTanggal = trim((string)($data[$idx + 15] ?? ''));
+
+            // Formatter No HP
+            $no_hp = $rawNoHp;
+            if (str_starts_with($no_hp, '62')) {
+                $no_hp = substr($no_hp, 2);
+            }
+            if (str_starts_with($no_hp, '0')) {
+                $no_hp = substr($no_hp, 1);
+            }
+            if (str_starts_with($no_hp, '8')) {
+                $no_hp = '62' . substr($no_hp, 0, 11);
+            } elseif (!empty($no_hp)) {
+                $no_hp = '62' . $no_hp;
+            }
+
+            // Cek duplikat
+            $exists = false;
+            if (strtoupper($status) !== 'PP') {
+                $exists = InaprocAccount::where('user_id', $user_id)->exists();
+            } else {
+                $exists = InaprocAccount::where('status', 'PP')
+                                        ->where('user_id', $user_id)
+                                        ->where('opd', $opd)
+                                        ->exists();
+            }
+
+            if ($exists) {
+                if (!empty($user_id)) {
+                    if (strtoupper($status) === 'PP') {
+                        $skippedUserIds[] = $user_id . ' (OPD: ' . $opd . ')';
+                    } else {
+                        $skippedUserIds[] = $user_id;
+                    }
+                }
+                continue;
+            }
+
+            // Konversi tanggal
+            $tanggalDaftar = null;
+            if (!empty($rawTanggal)) {
+                try {
+                    $rawTanggal = str_replace('-', '/', $rawTanggal);
+                    $tanggalDaftar = Carbon::createFromFormat('d/m/Y', $rawTanggal)->format('Y-m-d');
+                } catch (\Exception $e) {
+                    $tanggalDaftar = date('Y-m-d');
+                }
+            } else {
+                $tanggalDaftar = date('Y-m-d');
+            }
+
+            InaprocAccount::create([
+                'nama'               => $nama,
+                'opd'                => $opd,
+                'status'             => $status,
+                'no_surat_permohonan'=> $no_surat,
+                'perihal_permohonan' => $perihal,
+                'no_sk'              => $no_sk,
+                'user_id'            => $user_id,
+                'nik'                => $nik,
+                'nip'                => $nip,
+                'pangkat_gol'        => $pangkat,
+                'jabatan'            => $jabatan,
+                'no_hp'              => $no_hp,
+                'alamat'             => $alamat,
+                'sumber'             => $sumber,
+                'jenis_data'         => $jenis_data,
+                'tanggal_daftar'     => $tanggalDaftar,
+            ]);
+            $count++;
+        }
+
+        $response = back()->with('success', "Berhasil mengimport $count data Inaproc!");
+        if (count($skippedUserIds) > 0) {
+            $response->with('error', 'Gagal memproses beberapa akun karena User ID sudah terdaftar: ' . implode(', ', $skippedUserIds));
+        }
+        return $response;
     }
 }

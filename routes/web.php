@@ -26,7 +26,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->names('inaproc-accounts');
 
     Route::get('/export/pdf', [InaprocAccountController::class, 'exportPdf'])->name('inaproc.export-pdf');
-    Route::get('/export/csv', [InaprocAccountController::class, 'exportCsv'])->name('inaproc.export-csv');
+    Route::get('/export/xlsx', [InaprocAccountController::class, 'exportXlsx'])->name('inaproc.export-xlsx');
 
     // --- ROUTE PROFILE USER (Breeze) ---
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
