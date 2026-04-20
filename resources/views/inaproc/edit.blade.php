@@ -2,11 +2,11 @@
 
 @section('content')
 <div class="max-w-4xl mx-auto bg-white p-8 md:p-10 rounded-2xl shadow-xl outline outline-1 outline-gray-100 mb-10">
-    <div class="flex flex-col items-center justify-center mb-10 pb-6 border-b border-gray-100">
+    <a href="{{ route('inaproc-accounts.index') }}" class="flex flex-col items-center justify-center mb-10 pb-6 border-b border-gray-100 hover:opacity-80 transition-opacity">
         <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Coat_of_arms_of_West_Nusa_Tenggara.svg/500px-Coat_of_arms_of_West_Nusa_Tenggara.svg.png" class="h-16 w-auto mb-4" alt="Logo NTB">
         <h2 class="text-2xl font-black text-gray-800 tracking-tight">Form Edit Akun Inaproc</h2>
         <p class="text-sm font-bold text-gray-500 mt-1">LPSE Provinsi Nusa Tenggara Barat</p>
-    </div>
+    </a>
 
     <form action="{{ route('inaproc-accounts.update', $inaprocAccount->id) }}" method="POST">
         @csrf
