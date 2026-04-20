@@ -4,13 +4,13 @@
 <div class="space-y-6">
     {{-- HEADER SECTION --}}
     <div class="flex flex-col md:flex-row justify-between items-center bg-white p-4 md:p-6 rounded-xl shadow-sm border border-gray-100 gap-4">
-        <div class="flex flex-col md:flex-row items-center space-y-3 md:space-y-0 md:space-x-4 text-center md:text-left">
+        <a href="{{ route('inaproc-accounts.index') }}" class="flex flex-col md:flex-row items-center space-y-3 md:space-y-0 md:space-x-4 text-center md:text-left hover:opacity-80 transition-opacity">
             <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Coat_of_arms_of_West_Nusa_Tenggara.svg/500px-Coat_of_arms_of_West_Nusa_Tenggara.svg.png" class="h-12 md:h-14 w-auto" alt="Logo">
             <div>
                 <h1 class="text-xl md:text-2xl font-black text-blue-800 uppercase tracking-tight">Manajemen Akun Inaproc</h1>
                 <p class="text-[10px] md:text-xs text-gray-400 font-bold uppercase tracking-widest mt-1">LPSE Provinsi Nusa Tenggara Barat</p>
             </div>
-        </div>
+        </a>
         <div class="flex flex-wrap justify-center items-center gap-2">
             {{-- Tombol Grafik --}}
             <a href="{{ route('inaproc.grafik') }}" class="inline-flex items-center justify-center bg-indigo-600 hover:bg-indigo-700 text-white h-10 px-4 md:px-6 rounded-lg shadow-md shadow-indigo-100 transition-all font-bold text-xs md:text-sm">

@@ -4,13 +4,13 @@
 <div class="space-y-6">
     {{-- HEADER SECTION --}}
     <div class="flex flex-col md:flex-row justify-between items-center bg-white p-6 rounded-xl shadow-sm border border-gray-100 gap-4">
-        <div class="flex items-center space-x-4">
+        <a href="{{ route('inaproc-accounts.index') }}" class="flex items-center space-x-4 hover:opacity-80 transition-opacity">
             <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Coat_of_arms_of_West_Nusa_Tenggara.svg/500px-Coat_of_arms_of_West_Nusa_Tenggara.svg.png" class="h-14 w-auto" alt="Logo">
             <div>
                 <h1 class="text-2xl font-black text-blue-800 uppercase tracking-tight">Grafik Registrasi INAPROC</h1>
                 <p class="text-xs text-gray-400 font-bold uppercase tracking-widest">LPSE Provinsi Nusa Tenggara Barat</p>
             </div>
-        </div>
+        </a>
         <div class="flex items-center gap-3">
             {{-- Filter Tahun --}}
             <form action="{{ route('inaproc.grafik') }}" method="GET" class="flex items-center bg-gray-50 px-4 py-2 rounded-lg border border-gray-200">
