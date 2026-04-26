@@ -345,6 +345,38 @@
 </div>
 @endif
 
+{{-- MODAL NOTIFIKASI IMPORT ERROR (Status Invalid / DB Error) --}}
+@if(session('import_errors'))
+<div id="import-error-modal-overlay" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[9999] flex items-center justify-center transition-opacity duration-300">
+    <div id="import-error-modal" class="bg-white rounded-2xl shadow-2xl p-8 max-w-lg w-full mx-4 text-center transform scale-95 opacity-0 transition-all duration-300">
+        {{-- Icon Warning --}}
+        <div class="mx-auto w-20 h-20 rounded-full bg-amber-100 flex items-center justify-center mb-5">
+            <svg class="w-10 h-10 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+        </div>
+        <h3 class="text-xl font-black text-gray-800 mb-2">Gagal Import Beberapa Data</h3>
+        <p class="text-xs text-gray-400 mb-3">Data berikut tidak dapat diimport karena nilai kolom <span class="font-bold text-amber-600">Status</span> tidak valid. Status yang diizinkan: <span class="font-bold text-gray-600">PPK, PP, Bendahara, POKJA, Auditor, PA, KPA</span></p>
+        <div class="text-left bg-amber-50 border border-amber-200 p-4 rounded-xl mb-5 max-h-52 overflow-y-auto">
+            <ul class="space-y-2">
+                @foreach(session('import_errors') as $err)
+                <li class="flex items-start gap-2 text-sm text-amber-800">
+                    <svg class="w-4 h-4 text-amber-500 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01"/>
+                    </svg>
+                    <span class="font-medium break-words">{{ $err }}</span>
+                </li>
+                @endforeach
+            </ul>
+        </div>
+        <p class="text-[10px] text-gray-400 mb-4 font-bold uppercase tracking-wider">Total gagal: {{ count(session('import_errors')) }} baris</p>
+        <button onclick="closeImportErrorModal()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-2.5 px-6 rounded-xl transition-colors shadow-lg shadow-amber-100">
+            Tutup & Perbaiki Data
+        </button>
+    </div>
+</div>
+@endif
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const searchInput = document.getElementById('search-input');
@@ -379,6 +411,14 @@
                 errorModal.classList.add('scale-100', 'opacity-100');
             }, 50);
         }
+
+        const importErrorModal = document.getElementById('import-error-modal');
+        if (importErrorModal) {
+            setTimeout(() => {
+                importErrorModal.classList.remove('scale-95', 'opacity-0');
+                importErrorModal.classList.add('scale-100', 'opacity-100');
+            }, 50);
+        }
     });
 
     function closeSuccessModal() {
@@ -393,6 +433,15 @@
     function closeErrorModal() {
         const modal = document.getElementById('error-modal');
         const overlay = document.getElementById('error-modal-overlay');
+        modal.classList.remove('scale-100', 'opacity-100');
+        modal.classList.add('scale-95', 'opacity-0');
+        overlay.classList.add('opacity-0');
+        setTimeout(() => overlay.remove(), 300);
+    }
+
+    function closeImportErrorModal() {
+        const modal = document.getElementById('import-error-modal');
+        const overlay = document.getElementById('import-error-modal-overlay');
         modal.classList.remove('scale-100', 'opacity-100');
         modal.classList.add('scale-95', 'opacity-0');
         overlay.classList.add('opacity-0');

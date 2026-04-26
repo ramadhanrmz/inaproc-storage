@@ -734,6 +734,8 @@ public function exportPdf(Request $request)
 
         $count = 0;
         $skippedUserIds = [];
+        $invalidRows = [];
+        $allowedStatuses = ['PPK', 'PP', 'Bendahara', 'POKJA', 'Auditor', 'PA', 'KPA'];
 
         // Helper: bersihkan nilai numerik
         $cleanNumericField = function($val) {
@@ -786,25 +788,34 @@ public function exportPdf(Request $request)
                 $no_hp = '62' . $no_hp;
             }
 
-            // Cek duplikat
-            $exists = false;
-            if (strtoupper($status) !== 'PP') {
-                $exists = InaprocAccount::where('user_id', $user_id)->exists();
-            } else {
-                $exists = InaprocAccount::where('status', 'PP')
-                                        ->where('user_id', $user_id)
-                                        ->where('opd', $opd)
-                                        ->exists();
-            }
+            // Cek duplikat — semua kolom harus sama agar dianggap duplikat
+            $exists = InaprocAccount::where('nama', $nama)
+                                    ->where('opd', $opd)
+                                    ->where('status', $status)
+                                    ->where('no_surat_permohonan', $no_surat)
+                                    ->where('perihal_permohonan', $perihal)
+                                    ->where('no_sk', $no_sk)
+                                    ->where('user_id', $user_id)
+                                    ->where('nik', $nik)
+                                    ->where('nip', $nip)
+                                    ->where('pangkat_gol', $pangkat)
+                                    ->where('jabatan', $jabatan)
+                                    ->where('no_hp', $no_hp)
+                                    ->where('alamat', $alamat)
+                                    ->where('sumber', $sumber)
+                                    ->where('jenis_data', $jenis_data)
+                                    ->exists();
 
             if ($exists) {
-                if (!empty($user_id)) {
-                    if (strtoupper($status) === 'PP') {
-                        $skippedUserIds[] = $user_id . ' (OPD: ' . $opd . ')';
-                    } else {
-                        $skippedUserIds[] = $user_id;
-                    }
-                }
+                $rowLabel = !empty($nama) ? $nama : (!empty($user_id) ? $user_id : 'Baris tanpa nama');
+                $skippedUserIds[] = $rowLabel;
+                continue;
+            }
+
+            // Validasi status terhadap ENUM yang diizinkan
+            if (!in_array($status, $allowedStatuses)) {
+                $rowLabel = !empty($nama) ? $nama : (!empty($user_id) ? $user_id : 'Baris tanpa nama');
+                $invalidRows[] = $rowLabel . ' (Status: "' . ($status ?: 'kosong') . '")';
                 continue;
             }
 
@@ -821,30 +832,46 @@ public function exportPdf(Request $request)
                 $tanggalDaftar = date('Y-m-d');
             }
 
-            InaprocAccount::create([
-                'nama'               => $nama,
-                'opd'                => $opd,
-                'status'             => $status,
-                'no_surat_permohonan'=> $no_surat,
-                'perihal_permohonan' => $perihal,
-                'no_sk'              => $no_sk,
-                'user_id'            => $user_id,
-                'nik'                => $nik,
-                'nip'                => $nip,
-                'pangkat_gol'        => $pangkat,
-                'jabatan'            => $jabatan,
-                'no_hp'              => $no_hp,
-                'alamat'             => $alamat,
-                'sumber'             => $sumber,
-                'jenis_data'         => $jenis_data,
-                'tanggal_daftar'     => $tanggalDaftar,
-            ]);
+            try {
+                InaprocAccount::create([
+                    'nama'               => $nama,
+                    'opd'                => $opd,
+                    'status'             => $status,
+                    'no_surat_permohonan'=> $no_surat,
+                    'perihal_permohonan' => $perihal,
+                    'no_sk'              => $no_sk,
+                    'user_id'            => $user_id,
+                    'nik'                => $nik,
+                    'nip'                => $nip,
+                    'pangkat_gol'        => $pangkat,
+                    'jabatan'            => $jabatan,
+                    'no_hp'              => $no_hp,
+                    'alamat'             => $alamat,
+                    'sumber'             => $sumber,
+                    'jenis_data'         => $jenis_data,
+                    'tanggal_daftar'     => $tanggalDaftar,
+                ]);
+            } catch (\Illuminate\Database\QueryException $e) {
+                $rowLabel = !empty($nama) ? $nama : (!empty($user_id) ? $user_id : 'Baris tanpa nama');
+                $invalidRows[] = $rowLabel . ' (DB Error: ' . $e->getMessage() . ')';
+                continue;
+            }
             $count++;
         }
 
-        $response = back()->with('success', "Berhasil mengimport $count data Inaproc!");
+        $response = back();
+
+        if ($count > 0) {
+            $response->with('success', "Berhasil mengimport $count data Inaproc!");
+        }
         if (count($skippedUserIds) > 0) {
-            $response->with('error', 'Gagal memproses beberapa akun karena User ID sudah terdaftar: ' . implode(', ', $skippedUserIds));
+            $response->with('error', 'Data duplikat terdeteksi (semua kolom sama), tidak diimport: ' . implode(', ', $skippedUserIds));
+        }
+        if (count($invalidRows) > 0) {
+            $response->with('import_errors', $invalidRows);
+        }
+        if ($count === 0 && count($skippedUserIds) === 0 && count($invalidRows) === 0) {
+            $response->with('error', 'Tidak ada data yang berhasil diimport. Pastikan file tidak kosong.');
         }
         return $response;
     }
