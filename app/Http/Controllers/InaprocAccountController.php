@@ -812,12 +812,19 @@ public function exportPdf(Request $request)
                 continue;
             }
 
-            // Validasi status terhadap ENUM yang diizinkan
-            if (!in_array($status, $allowedStatuses)) {
+            // Validasi & normalisasi status terhadap ENUM (case-insensitive)
+            $statusMap = array_combine(
+                array_map('strtoupper', $allowedStatuses),
+                $allowedStatuses
+            ); // ['PPK'=>'PPK', 'PP'=>'PP', 'BENDAHARA'=>'Bendahara', 'POKJA'=>'POKJA', 'AUDITOR'=>'Auditor', 'PA'=>'PA', 'KPA'=>'KPA']
+
+            $statusUpper = strtoupper($status);
+            if (!isset($statusMap[$statusUpper])) {
                 $rowLabel = !empty($nama) ? $nama : (!empty($user_id) ? $user_id : 'Baris tanpa nama');
                 $invalidRows[] = $rowLabel . ' (Status: "' . ($status ?: 'kosong') . '")';
                 continue;
             }
+            $status = $statusMap[$statusUpper]; // Normalisasi ke format ENUM yang benar
 
             // Konversi tanggal
             $tanggalDaftar = null;
