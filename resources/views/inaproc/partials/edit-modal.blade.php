@@ -212,7 +212,7 @@ function openEditModal(id) {
     }, 50);
 
     // Fetch account data
-    fetch(`/accounts/${id}`, {
+    fetch(`{{ url('accounts') }}/${id}`, {
         headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
     })
     .then(r => r.json())
@@ -277,7 +277,7 @@ function submitEditForm(e) {
 
     const formData = new FormData(form);
 
-    fetch(`/accounts/${editAccountId}`, {
+    fetch(`{{ url('accounts') }}/${editAccountId}`, {
         method: 'POST',
         headers: {
             'X-Requested-With': 'XMLHttpRequest',

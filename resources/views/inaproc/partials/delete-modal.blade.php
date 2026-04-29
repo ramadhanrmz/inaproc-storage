@@ -39,7 +39,7 @@ function openDeleteModal(id, nama) {
     nameLabel.textContent = "'" + nama + "'";
     
     // Update action url
-    form.action = `/accounts/${id}`;
+    form.action = `{{ url('accounts') }}/${id}`;
 
     // Show overlay
     overlay.classList.remove('hidden');

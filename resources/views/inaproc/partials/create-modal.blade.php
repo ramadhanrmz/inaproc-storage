@@ -233,7 +233,7 @@ function submitCreateForm(e) {
 
     const formData = new FormData(form);
 
-    fetch(`/accounts`, {
+    fetch(`{{ url('accounts') }}`, {
         method: 'POST',
         headers: {
             'X-Requested-With': 'XMLHttpRequest',

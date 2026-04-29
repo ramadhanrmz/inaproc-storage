@@ -278,8 +278,11 @@ class InaprocAccountController extends Controller
             'tanggal_daftar.date' => 'Format tanggal tidak valid.',
         ]);
 
-        // Format No HP menjadi awalan 62 secara otomatis
-        $validated['no_hp'] = '62' . ltrim($validated['no_hp'], '0');
+        // Format No HP menjadi awalan 62 secara otomatis (Mendukung hingga 13 digit setelah prefix)
+        $no_hp = preg_replace('/[^0-9]/', '', $validated['no_hp']);
+        if (str_starts_with($no_hp, '62')) $no_hp = substr($no_hp, 2);
+        if (str_starts_with($no_hp, '0')) $no_hp = substr($no_hp, 1);
+        $validated['no_hp'] = '62' . substr($no_hp, 0, 13);
 
         InaprocAccount::create($validated);
 
@@ -328,8 +331,11 @@ class InaprocAccountController extends Controller
             'user_id.unique' => 'User ID ini sudah pernah didaftarkan.',
         ]);
 
-        // Format No HP menjadi awalan 62 secara otomatis
-        $validated['no_hp'] = '62' . ltrim($validated['no_hp'], '0');
+        // Format No HP menjadi awalan 62 secara otomatis (Mendukung hingga 13 digit setelah prefix)
+        $no_hp = preg_replace('/[^0-9]/', '', $validated['no_hp']);
+        if (str_starts_with($no_hp, '62')) $no_hp = substr($no_hp, 2);
+        if (str_starts_with($no_hp, '0')) $no_hp = substr($no_hp, 1);
+        $validated['no_hp'] = '62' . substr($no_hp, 0, 13);
 
         $inaprocAccount->update($validated);
 
@@ -583,20 +589,11 @@ public function exportPdf(Request $request)
             $nip = $cleanNumericField($nip);
             $rawNoHp = $cleanNumericField($rawNoHp);
 
-            // Formatter untuk Nomor HP: normalisasi ke format 62 + 11 digit mulai dari angka 8
+            // Formatter untuk Nomor HP: normalisasi ke format 62 (Mendukung hingga 13 digit setelah prefix)
             $no_hp = $rawNoHp; // Sudah dibersihkan oleh $cleanNumericField
-            if (str_starts_with($no_hp, '62')) {
-                $no_hp = substr($no_hp, 2); // Hapus prefix 62 dulu
-            }
-            if (str_starts_with($no_hp, '0')) {
-                $no_hp = substr($no_hp, 1); // Hapus angka 0 di depan
-            }
-            // Pastikan dimulai dari angka 8, ambil 11 digit
-            if (str_starts_with($no_hp, '8')) {
-                $no_hp = '62' . substr($no_hp, 0, 11);
-            } elseif (!empty($no_hp)) {
-                $no_hp = '62' . $no_hp; // Fallback jika format tidak dikenali
-            }
+            if (str_starts_with($no_hp, '62')) $no_hp = substr($no_hp, 2);
+            if (str_starts_with($no_hp, '0')) $no_hp = substr($no_hp, 1);
+            $no_hp = '62' . substr($no_hp, 0, 13);
 
             // Pengecekan dibuat SANGAT KETAT hanya berdasarkan User ID, kecuali untuk status PP
             $exists = false;
@@ -790,19 +787,11 @@ public function exportPdf(Request $request)
             $jenis_data = trim((string)($data[$idx + 14] ?? '')) ?: 'Katalog v.6';
             $rawTanggal = trim((string)($data[$idx + 15] ?? ''));
 
-            // Formatter No HP
+            // Formatter No HP (Mendukung hingga 13 digit setelah prefix)
             $no_hp = $rawNoHp;
-            if (str_starts_with($no_hp, '62')) {
-                $no_hp = substr($no_hp, 2);
-            }
-            if (str_starts_with($no_hp, '0')) {
-                $no_hp = substr($no_hp, 1);
-            }
-            if (str_starts_with($no_hp, '8')) {
-                $no_hp = '62' . substr($no_hp, 0, 11);
-            } elseif (!empty($no_hp)) {
-                $no_hp = '62' . $no_hp;
-            }
+            if (str_starts_with($no_hp, '62')) $no_hp = substr($no_hp, 2);
+            if (str_starts_with($no_hp, '0')) $no_hp = substr($no_hp, 1);
+            $no_hp = '62' . substr($no_hp, 0, 13);
 
             // Cek duplikat — semua kolom harus sama agar dianggap duplikat
             $exists = InaprocAccount::where('nama', $nama)
