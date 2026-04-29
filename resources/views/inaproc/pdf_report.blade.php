@@ -24,7 +24,11 @@
     <div class="header">
         <h2>Rekapitulasi Registrasi dan Aktivasi Akun INAPROC Non Penyedia {{ strtoupper($jenis) }}</h2>
         <h2>Pemerintah Provinsi NTB</h2>
-        @if($namaBulan) <h3>Bulan: {{ $namaBulan }} {{ $tahun }}</h3> @endif
+        @if($periode)
+            <div style="margin-top: 5px; font-weight: bold; font-size: 13px;">Bulan {{ $periode }} {{ $tahun }}</div>
+        @else
+            <div style="margin-top: 5px; font-weight: bold; font-size: 13px;">Tahun {{ $tahun }}</div>
+        @endif
     </div>
 
     <table>
@@ -55,8 +59,12 @@
                     $countPP = $accounts->where('status', 'PP')->count();
                     $countBendahara = $accounts->where('status', 'Bendahara')->count();
                     
-                    // Logika: Hanya tampilkan jika setidaknya ada 1 akun di kategori manapun
-                    $hasData = ($countPPK + $countPP + $countBendahara) > 0;
+                    // Logika: Hanya tampilkan jika setidaknya ada 1 akun di kategori yang ditampilkan
+                    if ($jenis == 'SPSE') {
+                        $hasData = ($countPPK + $countPP) > 0;
+                    } else {
+                        $hasData = ($countPPK + $countPP + $countBendahara) > 0;
+                    }
                 @endphp
 
                 @if($hasData)
@@ -76,14 +84,13 @@
                         <td class="text-center">
                             @if($jenis == 'SPSE' && $countPPK > 0 && $countPP > 0)
                                 Lengkap
-                            @else
-                                @endif
+                            @endif
                         </td>
                     </tr>
                 @endif
             @empty
                 <tr>
-                    <td colspan="{{ $jenis == 'Katalog v.6' ? 6 : 5 }}" class="text-center" style="padding: 20px;">
+                    <td colspan="{{ $jenis == 'SPSE' ? 4 : 5 }}" class="text-center" style="padding: 20px;">
                         Tidak ada data ditemukan untuk kriteria filter ini.
                     </td>
                 </tr>
@@ -104,7 +111,17 @@
     </table>
 
     <div class="footer">
-        Mataram, {{ date('d F Y') }}<br>
+        @php
+            $bulanIndo = [
+                1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
+                5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
+                9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
+            ];
+            $tgl = date('d');
+            $bln = (int)date('m');
+            $thn = date('Y');
+        @endphp
+        Mataram, {{ $tgl }} {{ $bulanIndo[$bln] }} {{ $thn }}<br>
         Kepala Bagian LPSE
         <div class="signature-space">
             <img src="{{ storage_path('app/private/images/tanda_tangan.png') }}" alt="Tanda Tangan">

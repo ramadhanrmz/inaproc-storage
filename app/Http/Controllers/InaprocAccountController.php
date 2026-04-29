@@ -76,16 +76,18 @@ class InaprocAccountController extends Controller
             // Total utama (Sama dengan baseDetail karena filternya sudah lengkap)
             'total' => (clone $baseDetail)->count(),
             
-            // Statistik Katalog (Otomatis jadi 0 kalau statusFilter-nya bukan PPK/PP/BDH)
+            // Statistik Katalog (Otomatis jadi 0 kalau statusFilter-nya bukan PPK/PP/BDH/Auditor)
             'katalog_ppk' => (clone $baseDetail)->where('jenis_data', 'Katalog v.6')->where('status', 'PPK')->count(),
             'katalog_pp' => (clone $baseDetail)->where('jenis_data', 'Katalog v.6')->where('status', 'PP')->count(),
             'katalog_bendahara' => (clone $baseDetail)->where('jenis_data', 'Katalog v.6')->where('status', 'Bendahara')->count(),
+            'katalog_auditor' => (clone $baseDetail)->where('jenis_data', 'Katalog v.6')->where('status', 'Auditor')->count(),
             
-            // Statistik SPSE (Otomatis jadi 0 kalau statusFilter-nya bukan PPK/PP/PKJ/KPA)
+            // Statistik SPSE (Otomatis jadi 0 kalau statusFilter-nya bukan PPK/PP/PKJ/Auditor/KPA)
             'spse_ppk' => (clone $baseDetail)->where('jenis_data', 'SPSE')->where('status', 'PPK')->count(),
             'spse_pp' => (clone $baseDetail)->where('jenis_data', 'SPSE')->where('status', 'PP')->count(),
             'spse_pokja' => (clone $baseDetail)->where('jenis_data', 'SPSE')->where('status', 'POKJA')->count(),
-            'spse_lainnya' => (clone $baseDetail)->where('jenis_data', 'SPSE')->whereIn('status', ['PA', 'KPA', 'Auditor'])->count(),
+            'spse_auditor' => (clone $baseDetail)->where('jenis_data', 'SPSE')->where('status', 'Auditor')->count(),
+            'spse_lainnya' => (clone $baseDetail)->where('jenis_data', 'SPSE')->whereIn('status', ['PA', 'KPA'])->count(),
         ];
 
         // 4. Eksekusi Query Tabel
@@ -362,7 +364,8 @@ public function exportPdf(Request $request)
     {
         // 1. Tangkap semua filter yang aktif (Sudah benar)
         $jenis = $request->get('jenis');
-        $bulan = $request->get('bulan');
+        $startMonth = $request->get('start_month');
+        $endMonth = $request->get('end_month');
         $tahun = $request->get('tahun') ?? date('Y');
         $search = $request->get('search');
         $statusFilter = $request->get('status_filter');
@@ -382,24 +385,47 @@ public function exportPdf(Request $request)
             $query->where('status', $statusFilter);
         }
 
-        // --- KOREKSI DI SINI: Ganti created_at menjadi tanggal_daftar ---
-        if ($bulan) {
-            $query->whereMonth('tanggal_daftar', $bulan);
+        if ($startMonth || $endMonth) {
+            $s = $startMonth ? (int)$startMonth : 1;
+            $e = $endMonth ? (int)$endMonth : 12;
+            if ($s > $e) $e = $s;
+            $query->whereMonth('tanggal_daftar', '>=', $s)
+                  ->whereMonth('tanggal_daftar', '<=', $e);
         }
         
         if ($tahun) {
             $query->whereYear('tanggal_daftar', $tahun);
         }
-        // ----------------------------------------------------------------
 
         // 3. Ambil data dan kelompokkan
-        // Urutkan berdasarkan nama OPD secara abjad A-Z agar laporan PDF rapi
         $data = $query->orderBy('opd', 'asc')->get()->groupBy('opd');
 
-        // Sisanya tetap sama...
-        $namaBulan = $bulan ? date('F', mktime(0, 0, 0, $bulan, 1)) : '';
+        // 4. Generate Nama Periode untuk Header
+        $bulanNames = [
+            1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
+            5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
+            9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
+        ];
 
-        $pdf = Pdf::loadView('inaproc.pdf_report', compact('data', 'namaBulan', 'tahun', 'jenis'))
+        $periode = '';
+        if ($startMonth && $endMonth) {
+            if ($startMonth == $endMonth) {
+                $periode = $bulanNames[(int)$startMonth];
+            } else {
+                $periode = $bulanNames[(int)$startMonth] . ' - ' . $bulanNames[(int)$endMonth];
+            }
+        } elseif ($startMonth) {
+            $periode = $bulanNames[(int)$startMonth] . ' - Desember';
+        } elseif ($endMonth) {
+            $periode = 'Januari - ' . $bulanNames[(int)$endMonth];
+        }
+
+        $pdf = Pdf::loadView('inaproc.pdf_report', [
+            'data' => $data,
+            'periode' => $periode,
+            'tahun' => $tahun,
+            'jenis' => $jenis
+        ])
                 ->setPaper('a4', 'portrait');
 
         return $pdf->stream("Rekapitulasi_{$jenis}.pdf");

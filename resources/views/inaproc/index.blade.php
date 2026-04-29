@@ -13,7 +13,7 @@
         </a>
         <div class="flex flex-wrap justify-center items-center gap-2">
             {{-- Tombol Grafik --}}
-            <a href="{{ route('inaproc.grafik') }}" class="inline-flex items-center justify-center bg-indigo-600 hover:bg-indigo-700 text-white h-10 px-4 md:px-6 rounded-lg shadow-md shadow-indigo-100 transition-all font-bold text-xs md:text-sm">
+            <a href="{{ route('inaproc.grafik') }}" target="_blank" class="inline-flex items-center justify-center bg-indigo-600 hover:bg-indigo-700 text-white h-10 px-4 md:px-6 rounded-lg shadow-md shadow-indigo-100 transition-all font-bold text-xs md:text-sm">
                 <svg class="w-4 h-4 mr-1 md:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
                 Grafik
             </a>
@@ -52,21 +52,25 @@
                 <p class="text-[10px] font-bold text-orange-500 uppercase tracking-wider">User Katalog v.6</p>
                 {{-- Penjumlahan Otomatis Katalog --}}
                 <span class="text-xl font-black text-slate-700 leading-none">
-                    {{ $stats['katalog_ppk'] + $stats['katalog_pp'] + $stats['katalog_bendahara'] }}
+                    {{ $stats['katalog_ppk'] + $stats['katalog_pp'] + $stats['katalog_bendahara'] + $stats['katalog_auditor'] }}
                 </span>
             </div>
             <div class="flex justify-between items-center text-sm mt-3">
-                <div class="text-center border-r border-gray-100 pr-4 w-full">
+                <div class="text-center border-r border-gray-100 pr-2 w-full">
                     <span class="block font-bold text-gray-700">{{ $stats['katalog_ppk'] }}</span>
                     <span class="text-[9px] text-gray-400 uppercase font-bold">PPK</span>
                 </div>
-                <div class="text-center border-r border-gray-100 pr-4 w-full">
+                <div class="text-center border-r border-gray-100 pr-2 w-full">
                     <span class="block font-bold text-gray-700">{{ $stats['katalog_pp'] }}</span>
                     <span class="text-[9px] text-gray-400 uppercase font-bold">PP</span>
                 </div>
-                <div class="text-center w-full">
+                <div class="text-center border-r border-gray-100 pr-2 w-full">
                     <span class="block font-bold text-gray-700">{{ $stats['katalog_bendahara'] }}</span>
                     <span class="text-[9px] text-gray-400 uppercase font-bold">BDH</span>
+                </div>
+                <div class="text-center w-full">
+                    <span class="block font-bold text-gray-700">{{ $stats['katalog_auditor'] }}</span>
+                    <span class="text-[9px] text-gray-400 uppercase font-bold">AUD</span>
                 </div>
             </div>
         </div>
@@ -77,25 +81,25 @@
                 <p class="text-[10px] font-bold text-purple-600 uppercase tracking-wider">User SPSE</p>
                 {{-- Penjumlahan Otomatis SPSE --}}
                 <span class="text-xl font-black text-slate-700 leading-none">
-                    {{ $stats['spse_ppk'] + $stats['spse_pp'] + $stats['spse_pokja'] + $stats['spse_lainnya'] }}
+                    {{ $stats['spse_ppk'] + $stats['spse_pp'] + $stats['spse_pokja'] + $stats['spse_auditor'] }}
                 </span>
             </div>
             <div class="flex justify-between items-center text-sm mt-3 text-center">
-                <div class="border-r border-gray-100 pr-2 w-full">
+                <div class="border-r border-gray-100 pr-1 w-full">
                     <span class="block font-bold text-gray-700">{{ $stats['spse_ppk'] }}</span>
                     <span class="text-[9px] text-gray-400 uppercase font-bold">PPK</span>
                 </div>
-                <div class="border-r border-gray-100 pr-2 w-full">
+                <div class="border-r border-gray-100 pr-1 w-full">
                     <span class="block font-bold text-gray-700">{{ $stats['spse_pp'] }}</span>
                     <span class="text-[9px] text-gray-400 uppercase font-bold">PP</span>
                 </div>
-                <div class="border-r border-gray-100 pr-2 w-full">
+                <div class="border-r border-gray-100 pr-1 w-full">
                     <span class="block font-bold text-gray-700">{{ $stats['spse_pokja'] }}</span>
                     <span class="text-[9px] text-gray-400 uppercase font-bold">PKJ</span>
                 </div>
                 <div class="w-full">
-                    <span class="block font-bold text-gray-700">{{ $stats['spse_lainnya'] }}</span>
-                    <span class="text-[9px] text-gray-400 uppercase font-bold">KPA</span>
+                    <span class="block font-bold text-gray-700">{{ $stats['spse_auditor'] }}</span>
+                    <span class="text-[9px] text-gray-400 uppercase font-bold">AUD</span>
                 </div>
             </div>
         </div>
