@@ -24,6 +24,12 @@
                 Tambah Data
             </button>
             
+            {{-- Tombol Ganti Password --}}
+            <button type="button" onclick="openPasswordModal()" class="inline-flex items-center justify-center bg-amber-500 hover:bg-amber-600 text-white h-10 px-4 md:px-6 rounded-lg shadow-md shadow-amber-100 transition-all font-bold text-xs md:text-sm">
+                <svg class="w-4 h-4 mr-1 md:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                Ganti Password
+            </button>
+            
             {{-- Form Logout Modern --}}
             <form method="POST" action="{{ route('logout') }}" class="m-0">
                 @csrf
@@ -36,70 +42,80 @@
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         {{-- CARD 1: TOTAL KESELURUHAN --}}
-        <div class="bg-white border-l-4 border-blue-600 p-5 rounded-xl shadow-sm flex items-center justify-between">
+        <div class="group bg-white border-l-4 border-blue-600 p-5 rounded-xl shadow-sm flex items-center justify-between transition-all duration-300 hover:shadow-lg hover:shadow-blue-100 hover:scale-[1.02]">
             <div>
                 <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Total Semua Akun</p>
                 <p class="text-3xl font-black text-blue-600">{{ $stats['total'] }}</p>
             </div>
-            <div class="text-blue-100">
-                <svg class="w-10 h-10" fill="currentColor" viewBox="0 0 20 20"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a7 7 0 00-7 7v1h11v-1a7 7 0 00-7-7z"></path></svg>
+            <div class="bg-blue-50 group-hover:bg-blue-100 rounded-2xl p-3 transition-all duration-300">
+                <svg class="w-10 h-10 text-blue-400 group-hover:text-blue-600 transition-colors duration-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
+                </svg>
             </div>
         </div>
 
         {{-- CARD 2: USER KATALOG V.6 --}}
-        <div class="bg-white border-l-4 border-orange-500 p-5 rounded-xl shadow-sm">
-            <div class="flex justify-between items-start mb-2">
-                <p class="text-[10px] font-bold text-orange-500 uppercase tracking-wider">User Katalog v.6</p>
-                {{-- Penjumlahan Otomatis Katalog --}}
-                <span class="text-xl font-black text-slate-700 leading-none">
-                    {{ $stats['katalog_ppk'] + $stats['katalog_pp'] + $stats['katalog_bendahara'] + $stats['katalog_auditor'] }}
-                </span>
-            </div>
-            <div class="flex justify-between items-center text-sm mt-3">
-                <div class="text-center border-r border-gray-100 pr-2 w-full">
-                    <span class="block font-bold text-gray-700">{{ $stats['katalog_ppk'] }}</span>
-                    <span class="text-[9px] text-gray-400 uppercase font-bold">PPK</span>
+        <div class="group relative bg-white border-l-4 border-orange-500 p-5 rounded-xl shadow-sm overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-orange-100 hover:scale-[1.02] cursor-default">
+            {{-- Gradient glow overlay on hover --}}
+            <div class="absolute inset-0 bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+            <div class="relative z-10">
+                <div class="flex justify-between items-start mb-2">
+                    <p class="text-[10px] font-bold text-orange-500 uppercase tracking-wider">User Katalog v.6</p>
+                    {{-- Penjumlahan Otomatis Katalog --}}
+                    <span class="text-xl font-black text-slate-700 leading-none group-hover:text-orange-600 transition-colors duration-300">
+                        {{ $stats['katalog_ppk'] + $stats['katalog_pp'] + $stats['katalog_bendahara'] + $stats['katalog_auditor'] }}
+                    </span>
                 </div>
-                <div class="text-center border-r border-gray-100 pr-2 w-full">
-                    <span class="block font-bold text-gray-700">{{ $stats['katalog_pp'] }}</span>
-                    <span class="text-[9px] text-gray-400 uppercase font-bold">PP</span>
-                </div>
-                <div class="text-center border-r border-gray-100 pr-2 w-full">
-                    <span class="block font-bold text-gray-700">{{ $stats['katalog_bendahara'] }}</span>
-                    <span class="text-[9px] text-gray-400 uppercase font-bold">BDH</span>
-                </div>
-                <div class="text-center w-full">
-                    <span class="block font-bold text-gray-700">{{ $stats['katalog_auditor'] }}</span>
-                    <span class="text-[9px] text-gray-400 uppercase font-bold">AUD</span>
+                <div class="flex justify-between items-center text-sm mt-3">
+                    <div class="text-center border-r border-gray-100 group-hover:border-orange-100 pr-2 w-full transition-colors duration-300">
+                        <span class="block font-bold text-gray-700 group-hover:text-orange-700 transition-colors duration-300">{{ $stats['katalog_ppk'] }}</span>
+                        <span class="text-[9px] text-gray-400 group-hover:text-orange-400 uppercase font-bold transition-colors duration-300">PPK</span>
+                    </div>
+                    <div class="text-center border-r border-gray-100 group-hover:border-orange-100 pr-2 w-full transition-colors duration-300">
+                        <span class="block font-bold text-gray-700 group-hover:text-orange-700 transition-colors duration-300">{{ $stats['katalog_pp'] }}</span>
+                        <span class="text-[9px] text-gray-400 group-hover:text-orange-400 uppercase font-bold transition-colors duration-300">PP</span>
+                    </div>
+                    <div class="text-center border-r border-gray-100 group-hover:border-orange-100 pr-2 w-full transition-colors duration-300">
+                        <span class="block font-bold text-gray-700 group-hover:text-orange-700 transition-colors duration-300">{{ $stats['katalog_bendahara'] }}</span>
+                        <span class="text-[9px] text-gray-400 group-hover:text-orange-400 uppercase font-bold transition-colors duration-300">BENDAHARA</span>
+                    </div>
+                    <div class="text-center w-full">
+                        <span class="block font-bold text-gray-700 group-hover:text-orange-700 transition-colors duration-300">{{ $stats['katalog_auditor'] }}</span>
+                        <span class="text-[9px] text-gray-400 group-hover:text-orange-400 uppercase font-bold transition-colors duration-300">AUDITOR</span>
+                    </div>
                 </div>
             </div>
         </div>
 
         {{-- CARD 3: USER SPSE --}}
-        <div class="bg-white border-l-4 border-purple-600 p-5 rounded-xl shadow-sm">
-            <div class="flex justify-between items-start mb-2">
-                <p class="text-[10px] font-bold text-purple-600 uppercase tracking-wider">User SPSE</p>
-                {{-- Penjumlahan Otomatis SPSE --}}
-                <span class="text-xl font-black text-slate-700 leading-none">
-                    {{ $stats['spse_ppk'] + $stats['spse_pp'] + $stats['spse_pokja'] + $stats['spse_auditor'] }}
-                </span>
-            </div>
-            <div class="flex justify-between items-center text-sm mt-3 text-center">
-                <div class="border-r border-gray-100 pr-1 w-full">
-                    <span class="block font-bold text-gray-700">{{ $stats['spse_ppk'] }}</span>
-                    <span class="text-[9px] text-gray-400 uppercase font-bold">PPK</span>
+        <div class="group relative bg-white border-l-4 border-purple-600 p-5 rounded-xl shadow-sm overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-purple-100 hover:scale-[1.02] cursor-default">
+            {{-- Gradient glow overlay on hover --}}
+            <div class="absolute inset-0 bg-gradient-to-br from-purple-50 via-indigo-50 to-violet-50 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+            <div class="relative z-10">
+                <div class="flex justify-between items-start mb-2">
+                    <p class="text-[10px] font-bold text-purple-600 uppercase tracking-wider">User SPSE</p>
+                    {{-- Penjumlahan Otomatis SPSE --}}
+                    <span class="text-xl font-black text-slate-700 leading-none group-hover:text-purple-600 transition-colors duration-300">
+                        {{ $stats['spse_ppk'] + $stats['spse_pp'] + $stats['spse_pokja'] + $stats['spse_auditor'] }}
+                    </span>
                 </div>
-                <div class="border-r border-gray-100 pr-1 w-full">
-                    <span class="block font-bold text-gray-700">{{ $stats['spse_pp'] }}</span>
-                    <span class="text-[9px] text-gray-400 uppercase font-bold">PP</span>
-                </div>
-                <div class="border-r border-gray-100 pr-1 w-full">
-                    <span class="block font-bold text-gray-700">{{ $stats['spse_pokja'] }}</span>
-                    <span class="text-[9px] text-gray-400 uppercase font-bold">PKJ</span>
-                </div>
-                <div class="w-full">
-                    <span class="block font-bold text-gray-700">{{ $stats['spse_auditor'] }}</span>
-                    <span class="text-[9px] text-gray-400 uppercase font-bold">AUD</span>
+                <div class="flex justify-between items-center text-sm mt-3 text-center">
+                    <div class="border-r border-gray-100 group-hover:border-purple-100 pr-1 w-full transition-colors duration-300">
+                        <span class="block font-bold text-gray-700 group-hover:text-purple-700 transition-colors duration-300">{{ $stats['spse_ppk'] }}</span>
+                        <span class="text-[9px] text-gray-400 group-hover:text-purple-400 uppercase font-bold transition-colors duration-300">PPK</span>
+                    </div>
+                    <div class="border-r border-gray-100 group-hover:border-purple-100 pr-1 w-full transition-colors duration-300">
+                        <span class="block font-bold text-gray-700 group-hover:text-purple-700 transition-colors duration-300">{{ $stats['spse_pp'] }}</span>
+                        <span class="text-[9px] text-gray-400 group-hover:text-purple-400 uppercase font-bold transition-colors duration-300">PP</span>
+                    </div>
+                    <div class="border-r border-gray-100 group-hover:border-purple-100 pr-1 w-full transition-colors duration-300">
+                        <span class="block font-bold text-gray-700 group-hover:text-purple-700 transition-colors duration-300">{{ $stats['spse_pokja'] }}</span>
+                        <span class="text-[9px] text-gray-400 group-hover:text-purple-400 uppercase font-bold transition-colors duration-300">POKJA</span>
+                    </div>
+                    <div class="w-full">
+                        <span class="block font-bold text-gray-700 group-hover:text-purple-700 transition-colors duration-300">{{ $stats['spse_auditor'] }}</span>
+                        <span class="text-[9px] text-gray-400 group-hover:text-purple-400 uppercase font-bold transition-colors duration-300">AUDITOR</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -459,4 +475,126 @@
         setTimeout(() => overlay.remove(), 300);
     }
 </script>
+    {{-- MODAL GANTI PASSWORD --}}
+    <div id="passwordModal" class="fixed inset-0 z-[60] hidden overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" onclick="closePasswordModal()"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
+            <div class="inline-block overflow-hidden text-left align-bottom transition-all transform bg-white rounded-2xl shadow-xl sm:my-8 sm:align-middle sm:max-w-md sm:w-full">
+                <div class="bg-white px-6 py-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-black text-gray-800 uppercase tracking-tight">Ganti Password Admin</h3>
+                        <button onclick="closePasswordModal()" class="text-gray-400 hover:text-gray-600">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                    </div>
+                    
+                    <form id="passwordForm" action="{{ route('password.update') }}" method="POST" class="space-y-4">
+                        @csrf
+                        @method('put')
+                        
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Password Saat Ini</label>
+                            <input type="password" name="current_password" required class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none transition-all text-sm font-bold">
+                            <span class="text-[10px] text-red-500 font-bold mt-1 hidden" id="error-current_password"></span>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Password Baru</label>
+                            <input type="password" name="password" required class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none transition-all text-sm font-bold">
+                            <span class="text-[10px] text-red-500 font-bold mt-1 hidden" id="error-password"></span>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Konfirmasi Password Baru</label>
+                            <input type="password" name="password_confirmation" required class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none transition-all text-sm font-bold">
+                        </div>
+
+                        <div class="pt-2">
+                            <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-black py-3 rounded-xl shadow-lg shadow-amber-100 transition-all uppercase tracking-widest text-xs">
+                                Simpan Password Baru
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openPasswordModal() {
+            document.getElementById('passwordModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePasswordModal() {
+            document.getElementById('passwordModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+            document.getElementById('passwordForm').reset();
+            hidePasswordErrors();
+        }
+
+        function hidePasswordErrors() {
+            document.querySelectorAll('[id^="error-"]').forEach(el => el.classList.add('hidden'));
+        }
+
+        document.getElementById('passwordForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const form = this;
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.innerText;
+            
+            submitBtn.disabled = true;
+            submitBtn.innerText = 'MEMPROSES...';
+            hidePasswordErrors();
+
+            fetch(form.action, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Accept': 'application/json'
+                },
+                body: new FormData(form)
+            })
+            .then(response => {
+                if (response.status === 200 || response.status === 302 || response.redirected) {
+                    // Berhasil
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: 'Password Admin berhasil diperbarui.',
+                        timer: 2000,
+                        showConfirmButton: false
+                    }).then(() => {
+                        location.reload();
+                    });
+                } else if (response.status === 422) {
+                    // Validasi Error
+                    return response.json().then(data => {
+                        const errors = data.errors || {};
+                        for (const key in errors) {
+                            const errorEl = document.getElementById('error-' + key);
+                            if (errorEl) {
+                                errorEl.innerText = errors[key][0];
+                                errorEl.classList.remove('hidden');
+                            }
+                        }
+                    });
+                } else {
+                    throw new Error('Terjadi kesalahan sistem.');
+                }
+            })
+            .catch(error => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: error.message
+                });
+            })
+            .finally(() => {
+                submitBtn.disabled = false;
+                submitBtn.innerText = originalBtnText;
+            });
+        });
+    </script>
 @endsection
