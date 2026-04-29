@@ -283,8 +283,19 @@ class InaprocAccountController extends Controller
 
         InaprocAccount::create($validated);
 
+        if ($request->ajax() || $request->wantsJson()) {
+            session()->flash('success', 'Data Akun Berhasil Disimpan!');
+            return response()->json(['success' => true, 'message' => 'Data Akun Berhasil Disimpan!']);
+        }
+
         return redirect()->route('inaproc-accounts.index')
                          ->with('success', 'Data Akun Berhasil Disimpan!');
+    }
+
+    // Mengembalikan data akun dalam format JSON untuk modal edit
+    public function show(InaprocAccount $inaprocAccount)
+    {
+        return response()->json($inaprocAccount);
     }
 
     // Menampilkan halaman form edit
@@ -321,6 +332,11 @@ class InaprocAccountController extends Controller
         $validated['no_hp'] = '62' . ltrim($validated['no_hp'], '0');
 
         $inaprocAccount->update($validated);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            session()->flash('success', 'Data Akun Berhasil Diperbarui!');
+            return response()->json(['success' => true, 'message' => 'Data Akun Berhasil Diperbarui!']);
+        }
 
         return redirect()->route('inaproc-accounts.index')
                         ->with('success', 'Data Akun Berhasil Diperbarui!');

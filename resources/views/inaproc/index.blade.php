@@ -19,10 +19,10 @@
             </a>
 
             {{-- Tombol Tambah Data Modern --}}
-            <a href="{{ route('inaproc-accounts.create') }}" class="inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white h-10 px-4 md:px-6 rounded-lg shadow-md shadow-blue-100 transition-all font-bold text-xs md:text-sm">
+            <button type="button" onclick="openCreateModal()" class="inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white h-10 px-4 md:px-6 rounded-lg shadow-md shadow-blue-100 transition-all font-bold text-xs md:text-sm">
                 <svg class="w-4 h-4 mr-1 md:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                 Tambah Data
-            </a>
+            </button>
             
             {{-- Form Logout Modern --}}
             <form method="POST" action="{{ route('logout') }}" class="m-0">
@@ -280,16 +280,13 @@
                         </td>
                         <td class="p-4">
                             <div class="flex justify-center space-x-2">
-                                <a href="{{ route('inaproc-accounts.edit', $item->id) }}" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-amber-100 text-amber-600 hover:bg-amber-600 hover:text-white transition-all">
+                                <button type="button" onclick="openEditModal({{ $item->id }})" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-amber-100 text-amber-600 hover:bg-amber-600 hover:text-white transition-all">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                                </a>
+                                </button>
 
-                                <form action="{{ route('inaproc-accounts.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Apakah yakin ingin menghapus data ini?')">
-                                    @csrf @method('DELETE')
-                                    <button type="submit" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-rose-100 text-rose-600 hover:bg-rose-600 hover:text-white transition-all">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                                    </button>
-                                </form>
+                                <button type="button" onclick="openDeleteModal({{ $item->id }}, '{{ addslashes($item->nama) }}')" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-rose-100 text-rose-600 hover:bg-rose-600 hover:text-white transition-all">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                </button>
                             </div>
                         </td>
                     </tr>
@@ -376,6 +373,15 @@
     </div>
 </div>
 @endif
+
+{{-- MODAL TAMBAH AKUN --}}
+@include('inaproc.partials.create-modal')
+
+{{-- MODAL EDIT AKUN --}}
+@include('inaproc.partials.edit-modal')
+
+{{-- MODAL HAPUS AKUN --}}
+@include('inaproc.partials.delete-modal')
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
