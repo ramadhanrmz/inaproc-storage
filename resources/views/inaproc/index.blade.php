@@ -559,14 +559,13 @@
             .then(response => {
                 if (response.status === 200 || response.status === 302 || response.redirected) {
                     // Berhasil
+                    closePasswordModal();
                     Swal.fire({
                         icon: 'success',
                         title: 'Berhasil!',
                         text: 'Password Admin berhasil diperbarui.',
-                        timer: 2000,
+                        timer: 2500,
                         showConfirmButton: false
-                    }).then(() => {
-                        location.reload();
                     });
                 } else if (response.status === 422) {
                     // Validasi Error
