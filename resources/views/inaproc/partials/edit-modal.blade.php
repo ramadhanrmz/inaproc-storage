@@ -1,6 +1,6 @@
 {{-- MODAL EDIT AKUN --}}
 <div id="edit-modal-overlay" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9999] flex items-center justify-center transition-opacity duration-300 hidden">
-    <div id="edit-modal" class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl mx-4 transform scale-95 opacity-0 transition-all duration-300 max-h-[90vh] flex flex-col">
+    <div id="edit-modal" class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl mx-4 transform scale-95 opacity-0 transition duration-300 max-h-[90vh] flex flex-col">
         {{-- Header --}}
         <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100 shrink-0">
             <div class="flex items-center space-x-3">
@@ -23,7 +23,7 @@
         </div>
 
         {{-- Form Body (scrollable) --}}
-        <form id="edit-form" class="overflow-y-auto flex-1 hidden" onsubmit="return submitEditForm(event)">
+        <form id="edit-form" class="overflow-y-auto flex-1 hidden overscroll-contain scroll-smooth" style="-webkit-overflow-scrolling: touch;" onsubmit="return submitEditForm(event)">
             @csrf
             @method('PUT')
             <div class="p-6 space-y-5">
