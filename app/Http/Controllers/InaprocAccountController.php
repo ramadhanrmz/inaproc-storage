@@ -420,9 +420,12 @@ public function exportPdf(Request $request)
             $periode = 'Januari - ' . $bulanNames[(int)$endMonth];
         }
 
-        $path = storage_path('app/private/images/tanda_tangan.png');
+        $path1 = storage_path('app/private/images/tanda_tangan.png');
+        $path2 = storage_path('app/private/tanda_tangan.png');
+        $path = file_exists($path1) ? $path1 : (file_exists($path2) ? $path2 : null);
+
         $base64 = '';
-        if (file_exists($path)) {
+        if ($path && file_exists($path)) {
             $type = pathinfo($path, PATHINFO_EXTENSION);
             $dataImg = file_get_contents($path);
             $base64 = 'data:image/' . $type . ';base64,' . base64_encode($dataImg);
