@@ -420,11 +420,20 @@ public function exportPdf(Request $request)
             $periode = 'Januari - ' . $bulanNames[(int)$endMonth];
         }
 
+        $path = storage_path('app/private/images/tanda_tangan.png');
+        $base64 = '';
+        if (file_exists($path)) {
+            $type = pathinfo($path, PATHINFO_EXTENSION);
+            $dataImg = file_get_contents($path);
+            $base64 = 'data:image/' . $type . ';base64,' . base64_encode($dataImg);
+        }
+
         $pdf = Pdf::loadView('inaproc.pdf_report', [
             'data' => $data,
             'periode' => $periode,
             'tahun' => $tahun,
-            'jenis' => $jenis
+            'jenis' => $jenis,
+            'signature' => $base64
         ])
                 ->setPaper('a4', 'portrait');
 

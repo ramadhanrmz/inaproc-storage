@@ -124,7 +124,11 @@
         Mataram, {{ $tgl }} {{ $bulanIndo[$bln] }} {{ $thn }}<br>
         Kepala Bagian LPSE
         <div class="signature-space">
-            <img src="{{ storage_path('app/private/images/tanda_tangan.png') }}" alt="Tanda Tangan">
+            @if($signature)
+                <img src="{{ $signature }}" alt="Tanda Tangan">
+            @else
+                <div style="height: 55px;"></div>
+            @endif
         </div>
         <span class="font-bold" style="text-decoration: underline;">Lalu Majemuk, S.Sos</span><br>
         NIP. 19711231 199402 1 015
