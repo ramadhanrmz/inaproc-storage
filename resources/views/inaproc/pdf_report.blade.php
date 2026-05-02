@@ -127,8 +127,7 @@
             @if($signature)
                 <img src="{{ $signature }}" alt="Tanda Tangan">
             @else
-                <div style="color: red; font-size: 8px;">[Gambar tidak ditemukan di server]</div>
-                <div style="height: 40px;"></div>
+                <div style="height: 55px;"></div>
             @endif
         </div>
         <span class="font-bold" style="text-decoration: underline;">Lalu Majemuk, S.Sos</span><br>
