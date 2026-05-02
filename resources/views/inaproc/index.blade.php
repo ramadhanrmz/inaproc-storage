@@ -254,6 +254,9 @@
             <table class="w-full text-left min-w-[800px]">
                 <thead>
                     <tr class="bg-gray-50/50 text-gray-400 uppercase text-[10px] font-black tracking-widest border-b border-gray-100">
+                        <th class="p-4 text-center w-10">
+                            <input type="checkbox" id="select-all-checkbox" class="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer" title="Pilih Semua">
+                        </th>
                         <th class="p-4 text-center">No</th>
                         <th class="p-4">Nama Lengkap</th>
                         <th class="p-4">Satuan Kerja</th>
@@ -265,7 +268,10 @@
                 </thead>
                 <tbody class="divide-y divide-gray-50">
                     @foreach($accounts as $index => $item)
-                    <tr class="hover:bg-blue-50/30 transition-colors">
+                    <tr class="hover:bg-blue-50/30 transition-colors bulk-row">
+                        <td class="p-4 text-center">
+                            <input type="checkbox" class="row-checkbox w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer" value="{{ $item->id }}">
+                        </td>
                         <td class="p-4 text-center text-xs font-bold text-gray-400">{{ $index + 1 }}</td>
                         <td class="p-4">
                             <div class="flex flex-col">
@@ -402,6 +408,9 @@
 @include('inaproc.partials.edit-modal')
 
 {{-- MODAL HAPUS AKUN --}}
+{{-- MODAL BULK DELETE --}}
+@include('inaproc.partials.bulk-delete-modal')
+
 @include('inaproc.partials.delete-modal')
 
 <script>

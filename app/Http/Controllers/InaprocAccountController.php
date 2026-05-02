@@ -925,4 +925,20 @@ public function exportPdf(Request $request)
         }
         return $response;
     }
+
+    /**
+     * Hapus beberapa akun sekaligus berdasarkan ID yang dipilih (checklist)
+     */
+    public function bulkDelete(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array|min:1',
+            'ids.*' => 'integer|exists:inaproc_accounts,id',
+        ]);
+
+        $count = InaprocAccount::whereIn('id', $request->ids)->delete();
+
+        return redirect()->route('inaproc-accounts.index')
+                         ->with('success', "Berhasil menghapus $count data akun!");
+    }
 }

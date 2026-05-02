@@ -35,6 +35,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::post('/inaproc/import', [InaprocAccountController::class, 'import'])->name('inaproc.import');
     Route::get('/inaproc/download-template', [InaprocAccountController::class, 'downloadTemplate'])->name('inaproc.download-template');
+    Route::post('/inaproc/bulk-delete', [InaprocAccountController::class, 'bulkDelete'])->name('inaproc.bulk-delete');
 });
 
 require __DIR__.'/auth.php';
