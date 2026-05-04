@@ -14,7 +14,7 @@
 </head>
 <body class="bg-[#f3f4f6] font-sans antialiased">
     {{-- Container lebar agar tabel tidak gepeng --}}
-    <div class="w-full p-4 md:p-8">
+    <div class="max-w-7xl mx-auto w-full p-4 md:p-8">
         @yield('content')
         {{-- Jaga-jaga agar tidak error undefined variable --}}
         {{ $slot ?? '' }}
