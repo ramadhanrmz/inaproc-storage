@@ -34,16 +34,16 @@
     <table>
         <thead>
             <tr class="bg-maroon">
-                <th rowspan="2" style="width: 25px;">NO</th>
-                <th rowspan="2" style="text-align: left;">NAMA PERANGKAT DAERAH</th>
-                <th colspan="{{ $jenis == 'SPSE' ? 2 : 3 }}">AKUN</th>
-                <th rowspan="2" style="width: 80px;">KETERANGAN</th>
+                <th rowspan="2" style="width: 25px; text-align: center;">NO</th>
+                <th rowspan="2" style="text-align: center;">NAMA PERANGKAT DAERAH</th>
+                <th colspan="{{ $jenis == 'SPSE' ? 2 : 3 }}" style="text-align: center;">AKUN</th>
+                <th rowspan="2" style="width: 80px; text-align: center;">KETERANGAN</th>
             </tr>
             <tr class="bg-maroon">
-                <th style="width: 40px;">PPK</th>
-                <th style="width: 40px;">PP</th>
+                <th style="width: 40px; text-align: center;">PPK</th>
+                <th style="width: 40px; text-align: center;">PP</th>
                 @if($jenis == 'Katalog v.6')
-                    <th style="width: 70px;">BENDAHARA</th>
+                    <th style="width: 70px; text-align: center;">BENDAHARA</th>
                 @endif
             </tr>
         </thead>
