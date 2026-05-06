@@ -135,13 +135,23 @@
                 </button>
                 
                 <!-- Dropdown Menu -->
-                <div class="absolute left-0 w-48 mt-2 origin-top-left bg-white border border-gray-100 divide-y divide-gray-50 rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[999]">
+                <div class="absolute left-0 w-56 mt-2 origin-top-left bg-white border border-gray-100 divide-y divide-gray-50 rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[999]">
                     <div class="py-2">
+                        <div class="px-4 py-1 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-50 mb-1">Rekapitulasi (Grouped)</div>
                         <a href="{{ route('inaproc.export-pdf', array_merge(request()->query(), ['jenis' => 'Katalog v.6'])) }}" target="_blank" class="flex items-center px-4 py-2 text-xs text-gray-700 hover:bg-blue-50 hover:text-blue-700 font-bold transition">
-                            📄 Katalog v.6
+                            📄 Rekap Katalog v.6
                         </a>
                         <a href="{{ route('inaproc.export-pdf', array_merge(request()->query(), ['jenis' => 'SPSE'])) }}" target="_blank" class="flex items-center px-4 py-2 text-xs text-gray-700 hover:bg-blue-50 hover:text-blue-700 font-bold transition">
-                            📄 SPSE
+                            📄 Rekap SPSE
+                        </a>
+                    </div>
+                    <div class="py-2">
+                        <div class="px-4 py-1 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-50 mb-1">Daftar Detail (New)</div>
+                        <a href="{{ route('inaproc.export-pdf-detail', array_merge(request()->query(), ['jenis' => 'Katalog v.6'])) }}" target="_blank" class="flex items-center px-4 py-2 text-xs text-gray-700 hover:bg-amber-50 hover:text-amber-700 font-bold transition">
+                            📋 Detail Katalog v.6
+                        </a>
+                        <a href="{{ route('inaproc.export-pdf-detail', array_merge(request()->query(), ['jenis' => 'SPSE'])) }}" target="_blank" class="flex items-center px-4 py-2 text-xs text-gray-700 hover:bg-amber-50 hover:text-amber-700 font-bold transition">
+                            📋 Detail SPSE
                         </a>
                     </div>
                 </div>

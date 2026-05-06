@@ -443,6 +443,90 @@ public function exportPdf(Request $request)
         return $pdf->stream("Rekapitulasi_{$jenis}.pdf");
     }
 
+    public function exportPdfDetail(Request $request)
+    {
+        $jenis = $request->get('jenis');
+        $startMonth = $request->get('start_month');
+        $endMonth = $request->get('end_month');
+        $tahun = $request->get('tahun') ?? date('Y');
+        $search = $request->get('search');
+        $statusFilter = $request->get('status_filter');
+
+        $query = InaprocAccount::query();
+        
+        if ($jenis) {
+            $query->where('jenis_data', $jenis);
+        }
+
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('nama', 'like', "%{$search}%")
+                ->orWhere('opd', 'like', "%{$search}%")
+                ->orWhere('user_id', 'like', "%{$search}%");
+            });
+        }
+
+        if ($statusFilter && $statusFilter != 'Semua Tipe') {
+            $query->where('status', $statusFilter);
+        }
+
+        if ($startMonth || $endMonth) {
+            $s = $startMonth ? (int)$startMonth : 1;
+            $e = $endMonth ? (int)$endMonth : 12;
+            if ($s > $e) $e = $s;
+            $query->whereMonth('tanggal_daftar', '>=', $s)
+                  ->whereMonth('tanggal_daftar', '<=', $e);
+        }
+        
+        if ($tahun) {
+            $query->whereYear('tanggal_daftar', $tahun);
+        }
+
+        $data = $query->orderBy('opd', 'asc')->orderBy('nama', 'asc')->get();
+
+        $bulanNames = [
+            1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
+            5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
+            9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
+        ];
+
+        $periode = '';
+        if ($startMonth && $endMonth) {
+            if ($startMonth == $endMonth) {
+                $periode = $bulanNames[(int)$startMonth];
+            } else {
+                $periode = $bulanNames[(int)$startMonth] . ' - ' . $bulanNames[(int)$endMonth];
+            }
+        } elseif ($startMonth) {
+            $periode = $bulanNames[(int)$startMonth] . ' - Desember';
+        } elseif ($endMonth) {
+            $periode = 'Januari - ' . $bulanNames[(int)$endMonth];
+        }
+
+        $path1 = storage_path('app/private/images/tanda_tangan.png');
+        $path2 = storage_path('app/private/tanda_tangan.png');
+        $path = file_exists($path1) ? $path1 : (file_exists($path2) ? $path2 : null);
+
+        $base64 = '';
+        if ($path && file_exists($path)) {
+            $type = pathinfo($path, PATHINFO_EXTENSION);
+            $dataImg = file_get_contents($path);
+            $base64 = 'data:image/' . $type . ';base64,' . base64_encode($dataImg);
+        }
+
+        $pdf = Pdf::loadView('inaproc.pdf_report_detail', [
+            'data' => $data,
+            'periode' => $periode,
+            'tahun' => $tahun,
+            'jenis' => $jenis,
+            'signature' => $base64
+        ])
+        ->setPaper('a4', 'portrait');
+
+        $filename = "Daftar_Akun_Inaproc" . ($jenis ? "_{$jenis}" : "") . ".pdf";
+        return $pdf->stream($filename);
+    }
+
     public function exportXlsx(Request $request)
     {
         $search = $request->get('search');
