@@ -20,18 +20,21 @@ class InaprocAccountController extends Controller
         $statusFilter = $request->get('status_filter');
         $startMonth = $request->get('start_month');
         $endMonth = $request->get('end_month');
-        $tahun = $request->get('tahun');
+        $tahun = $request->get('tahun', date('Y'));
         $jenisFilter = $request->get('jenis_filter');
+        $opdFilter = $request->get('opd_filter');
         $perPage = $request->get('per_page', 10);
 
         // 2. Query untuk Tabel (Data Utama)
-        $query = InaprocAccount::query();
+        $query = InaprocAccount::with('opd_detail');
 
         if ($search) {
             $query->where(function($q) use ($search) {
                 $q->where('nama', 'like', "%{$search}%")
                 ->orWhere('user_id', 'like', "%{$search}%")
-                ->orWhere('opd', 'like', "%{$search}%");
+                ->orWhereHas('opd_detail', function($sq) use ($search) {
+                    $sq->where('nama', 'like', "%{$search}%");
+                });
             });
         }
 
@@ -49,6 +52,7 @@ class InaprocAccountController extends Controller
         
         if ($tahun) $query->whereYear('tanggal_daftar', $tahun);
         if ($jenisFilter) $query->where('jenis_data', $jenisFilter);
+        if ($opdFilter) $query->where('opd_id', $opdFilter);
 
 
         // 3. LOGIKA STATISTIK (Cards) - Sekarang dibuat sangat sensitif terhadap semua filter
@@ -71,6 +75,7 @@ class InaprocAccountController extends Controller
 
         // Filter Jenis Data (Jika ada)
         if ($jenisFilter) $baseDetail->where('jenis_data', $jenisFilter);
+        if ($opdFilter) $baseDetail->where('opd_id', $opdFilter);
 
         // Hanya hitung akun yang aktif untuk statistik dashboard
         $baseDetail->where('is_active', true);
@@ -98,7 +103,9 @@ class InaprocAccountController extends Controller
             ? $query->orderBy('tanggal_daftar', 'desc')->orderBy('id', 'desc')->get() 
             : $query->orderBy('tanggal_daftar', 'desc')->orderBy('id', 'desc')->paginate($perPage)->withQueryString();
 
-        return view('inaproc.index', compact('accounts', 'stats'));
+        $opds = \App\Models\Opd::orderBy('nama', 'asc')->get();
+
+        return view('inaproc.index', compact('accounts', 'stats', 'opds'));
     }
 
     public function grafik(Request $request)
@@ -256,11 +263,12 @@ class InaprocAccountController extends Controller
             'alamat' => 'required',
             'sumber' => 'required',
             'jenis_data' => 'required|in:Katalog v.6,SPSE',
+            'opd_id' => 'required|exists:opds,id',
             'tanggal_daftar' => 'required|date',
             'is_active' => 'sometimes|boolean',
         ], [
             'nama.required' => 'Nama Lengkap wajib diisi.',
-            'opd.required' => 'Perangkat Daerah (OPD) wajib diisi.',
+            'opd_id.required' => 'Perangkat Daerah (OPD) wajib diisi.',
             'status.required' => 'Status wajib dipilih.',
             'no_surat_permohonan.required' => 'No. Surat Permohonan wajib diisi.',
             'perihal_permohonan.required' => 'Perihal Permohonan wajib dipilih.',
@@ -320,7 +328,7 @@ class InaprocAccountController extends Controller
     {
         $validated = $request->validate([
             'nama' => 'required',
-            'opd' => 'required',
+            'opd_id' => 'required|exists:opds,id',
             'status' => 'required',
             'no_surat_permohonan' => 'required',
             'perihal_permohonan' => 'required',
@@ -373,17 +381,20 @@ public function exportPdf(Request $request)
         $jenis = $request->get('jenis');
         $startMonth = $request->get('start_month');
         $endMonth = $request->get('end_month');
-        $tahun = $request->get('tahun') ?? date('Y');
+        $tahun = $request->get('tahun');
         $search = $request->get('search');
         $statusFilter = $request->get('status_filter');
+        $opdFilter = $request->get('opd_filter');
 
         // 2. Bangun Query
-        $query = InaprocAccount::where('jenis_data', $jenis);
+        $query = InaprocAccount::with('opd_detail')->where('jenis_data', $jenis);
 
         if ($search) {
             $query->where(function($q) use ($search) {
                 $q->where('nama', 'like', "%{$search}%")
-                ->orWhere('opd', 'like', "%{$search}%")
+                ->orWhereHas('opd_detail', function($sq) use ($search) {
+                    $sq->where('nama', 'like', "%{$search}%");
+                })
                 ->orWhere('user_id', 'like', "%{$search}%");
             });
         }
@@ -405,7 +416,9 @@ public function exportPdf(Request $request)
         }
 
         // 3. Ambil data dan kelompokkan
-        $data = $query->orderBy('opd', 'asc')->get()->groupBy('opd');
+        $data = $query->orderBy('tanggal_daftar', 'asc')->get()->groupBy(function($item) {
+            return $item->opd_detail->nama ?? 'Tanpa OPD';
+        })->sortKeys();
 
         // 4. Generate Nama Periode untuk Header
         $bulanNames = [
@@ -455,7 +468,7 @@ public function exportPdf(Request $request)
         $jenis = $request->get('jenis');
         $startMonth = $request->get('start_month');
         $endMonth = $request->get('end_month');
-        $tahun = $request->get('tahun') ?? date('Y');
+        $tahun = $request->get('tahun');
         $search = $request->get('search');
         $statusFilter = $request->get('status_filter');
 
@@ -468,7 +481,9 @@ public function exportPdf(Request $request)
         if ($search) {
             $query->where(function($q) use ($search) {
                 $q->where('nama', 'like', "%{$search}%")
-                ->orWhere('opd', 'like', "%{$search}%")
+                ->orWhereHas('opd_detail', function($sq) use ($search) {
+                    $sq->where('nama', 'like', "%{$search}%");
+                })
                 ->orWhere('user_id', 'like', "%{$search}%");
             });
         }
@@ -489,7 +504,13 @@ public function exportPdf(Request $request)
             $query->whereYear('tanggal_daftar', $tahun);
         }
 
-        $data = $query->orderBy('opd', 'asc')->orderBy('nama', 'asc')->get();
+        $data = $query->join('opds', 'inaproc_accounts.opd_id', '=', 'opds.id')
+            ->select('inaproc_accounts.*')
+            ->orderBy('opds.nama', 'asc')
+            ->orderByRaw("CASE WHEN inaproc_accounts.status = 'PPK' THEN 0 ELSE 1 END")
+            ->orderBy('inaproc_accounts.tanggal_daftar', 'asc')
+            ->orderBy('inaproc_accounts.nama', 'asc')
+            ->get();
 
         $bulanNames = [
             1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
@@ -540,8 +561,9 @@ public function exportPdf(Request $request)
         $statusFilter = $request->get('status_filter');
         $startMonth = $request->get('start_month');
         $endMonth = $request->get('end_month');
-        $tahun = $request->get('tahun', date('Y'));
+        $tahun = $request->get('tahun');
         $jenisFilter = $request->get('jenis_filter');
+        $opdFilter = $request->get('opd_filter');
 
         $query = InaprocAccount::query();
 
@@ -549,7 +571,9 @@ public function exportPdf(Request $request)
             $query->where(function($q) use ($search) {
                 $q->where('nama', 'like', "%{$search}%")
                 ->orWhere('user_id', 'like', "%{$search}%")
-                ->orWhere('opd', 'like', "%{$search}%");
+                ->orWhereHas('opd_detail', function($sq) use ($search) {
+                    $sq->where('nama', 'like', "%{$search}%");
+                });
             });
         }
 
@@ -573,7 +597,11 @@ public function exportPdf(Request $request)
             $query->where('jenis_data', $jenisFilter);
         }
 
-        $data = $query->orderBy('tanggal_daftar', 'desc')->orderBy('id', 'desc')->get();
+        if ($opdFilter) {
+            $query->where('opd_id', $opdFilter);
+        }
+
+        $data = $query->with('opd_detail')->orderBy('tanggal_daftar', 'asc')->orderBy('id', 'asc')->get();
 
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
@@ -583,11 +611,11 @@ public function exportPdf(Request $request)
         $columns = [
             'No.', 'Nama Lengkap', 'Perangkat Daerah', 'Status', 'No. Surat Permohonan', 'Perihal Permohonan', 
             'No SK', 'User ID', 'NIK', 'NIP', 'Pangkat/Gol', 'Jabatan', 
-            'No. WhatsApp', 'Alamat', 'Sumber Data', 'Jenis Data', 'Tanggal Aktif'
+            'No. WhatsApp', 'Alamat', 'Sumber Data', 'Jenis Data', 'Tanggal Aktif', 'Status Akun'
         ];
 
         // Tulis header dengan styling
-        $colLetters = range('A', 'Q');
+        $colLetters = range('A', 'R');
         foreach ($columns as $colIdx => $colName) {
             $cellRef = $colLetters[$colIdx] . '1';
             $sheet->setCellValue($cellRef, $colName);
@@ -605,7 +633,7 @@ public function exportPdf(Request $request)
         foreach ($data as $row) {
             $sheet->setCellValue("A{$rowNum}", $no++);
             $sheet->setCellValue("B{$rowNum}", $row->nama);
-            $sheet->setCellValue("C{$rowNum}", $row->opd);
+            $sheet->setCellValue("C{$rowNum}", $row->opd_detail->nama ?? '-');
             $sheet->setCellValue("D{$rowNum}", $row->status);
             $sheet->setCellValue("E{$rowNum}", $row->no_surat_permohonan);
             $sheet->setCellValue("F{$rowNum}", $row->perihal_permohonan);
@@ -621,11 +649,12 @@ public function exportPdf(Request $request)
             $sheet->setCellValue("O{$rowNum}", $row->sumber);
             $sheet->setCellValue("P{$rowNum}", $row->jenis_data);
             $sheet->setCellValue("Q{$rowNum}", Carbon::parse($row->tanggal_daftar)->format('d/m/Y'));
+            $sheet->setCellValue("R{$rowNum}", $row->is_active ? 'Aktif' : 'Non-aktif');
             $rowNum++;
         }
 
         // Auto-size kolom untuk kerapian
-        foreach (range('A', 'Q') as $col) {
+        foreach (range('A', 'R') as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 
@@ -676,7 +705,11 @@ public function exportPdf(Request $request)
             $idx = $isExportFormat ? 1 : 0; // Jika export, semua index geser 1 karena ada kolom "No."
             
             $nama       = trim($data[$idx] ?? '');
-            $opd        = trim($data[$idx + 1] ?? '');
+            $opdName    = trim($data[$idx + 1] ?? '');
+            
+            $opdModel   = \App\Models\Opd::firstOrCreate(['nama' => $opdName]);
+            $opd_id     = $opdModel->id;
+
             $status     = trim($data[$idx + 2] ?? '');
             $no_surat   = trim($data[$idx + 3] ?? '');
             $perihal    = trim($data[$idx + 4] ?? '');
@@ -693,6 +726,7 @@ public function exportPdf(Request $request)
             $sumber     = trim($data[$idx + 13] ?? 'Digital');
             $jenis_data = trim($data[$idx + 14] ?? 'Katalog v.6');
             $rawTanggal = trim($data[$idx + 15] ?? '');
+            $statusAkun = trim($data[$idx + 16] ?? 'Aktif');
 
             // Helper: bersihkan format ="value", tanda petik, dan scientific notation
             // Contoh: ="5201234567890123" -> 5201234567890123
@@ -729,20 +763,22 @@ public function exportPdf(Request $request)
             if (strtoupper($status) !== 'PP') {
                 $exists = InaprocAccount::where('user_id', $user_id)->exists();
             } else {
-                // Untuk PP: boleh duplikat user_id dan nama antar OPD yang berbeda.
-                // Jika user_id sama DAN opd sama, maka dianggap duplikat (tidak boleh).
-                // Jika user_id berbeda TETAPI opd sama, maka BOLEH (jangan dianggap duplikat).
-                $exists = InaprocAccount::where('status', 'PP')
-                                        ->where('user_id', $user_id)
-                                        ->where('opd', $opd)
+                $exists = InaprocAccount::where('user_id', $user_id)
+                                        ->where('nama', $nama)
+                                        ->where('opd_id', $opd_id)
                                         ->exists();
+
+                if ($exists) {
+                    $skippedUserIds[] = $user_id . ' (OPD: ' . $opdName . ')';
+                    continue;
+                }
             }
 
             if ($exists) {
                 // Simpan keterangan yang gagal karena duplikat
                 if (!empty($user_id)) {
                     if (strtoupper($status) === 'PP') {
-                        $skippedUserIds[] = $user_id . ' (OPD: ' . $opd . ')';
+                        $skippedUserIds[] = $user_id . ' (OPD: ' . $opdName . ')';
                     } else {
                         $skippedUserIds[] = $user_id;
                     }
@@ -767,7 +803,8 @@ public function exportPdf(Request $request)
 
             InaprocAccount::create([
                 'nama'               => $nama,
-                'opd'                => $opd,
+                'opd_id'             => $opd_id,
+                'opd'                => $opdName,
                 'status'             => $status,
                 'no_surat_permohonan'=> $no_surat,
                 'perihal_permohonan' => $perihal,
@@ -782,6 +819,7 @@ public function exportPdf(Request $request)
                 'sumber'             => $sumber,
                 'jenis_data'         => $jenis_data,
                 'tanggal_daftar'     => $tanggalDaftar,
+                'is_active'          => (strtolower($statusAkun) !== 'non-aktif' && strtolower($statusAkun) !== 'tidak aktif'),
             ]);
             $count++;
         }
@@ -808,11 +846,11 @@ public function exportPdf(Request $request)
         $columns = [
             'nama', 'opd', 'status', 'no_surat_permohonan', 'perihal_permohonan', 
             'no_sk', 'user_id', 'nik', 'nip', 'pangkat_gol', 'jabatan', 
-            'no_hp', 'alamat', 'sumber', 'jenis_data', 'tanggal_daftar'
+            'no_hp', 'alamat', 'sumber', 'jenis_data', 'tanggal_daftar', 'status_akun'
         ];
 
         // Tulis header
-        $colLetters = range('A', 'P');
+        $colLetters = range('A', 'Q');
         foreach ($columns as $colIdx => $colName) {
             $cellRef = $colLetters[$colIdx] . '1';
             $sheet->setCellValue($cellRef, $colName);
@@ -841,9 +879,10 @@ public function exportPdf(Request $request)
         $sheet->setCellValue('N2', 'Digital');
         $sheet->setCellValue('O2', 'Katalog v.6');
         $sheet->setCellValue('P2', '12/04/2026');
+        $sheet->setCellValue('Q2', 'Aktif');
 
         // Auto-size
-        foreach (range('A', 'P') as $col) {
+        foreach (range('A', 'Q') as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 
@@ -900,7 +939,11 @@ public function exportPdf(Request $request)
             $idx = $isExportFormat ? 1 : 0;
 
             $nama       = trim((string)($data[$idx] ?? ''));
-            $opd        = trim((string)($data[$idx + 1] ?? ''));
+            $opdName    = trim((string)($data[$idx + 1] ?? ''));
+            
+            $opdModel   = \App\Models\Opd::firstOrCreate(['nama' => $opdName]);
+            $opd_id     = $opdModel->id;
+
             $status     = trim((string)($data[$idx + 2] ?? ''));
             $no_surat   = trim((string)($data[$idx + 3] ?? ''));
             $perihal    = trim((string)($data[$idx + 4] ?? ''));
@@ -915,6 +958,7 @@ public function exportPdf(Request $request)
             $sumber     = trim((string)($data[$idx + 13] ?? '')) ?: 'Digital';
             $jenis_data = trim((string)($data[$idx + 14] ?? '')) ?: 'Katalog v.6';
             $rawTanggal = trim((string)($data[$idx + 15] ?? ''));
+            $statusAkun = trim((string)($data[$idx + 16] ?? 'Aktif'));
 
             // Formatter No HP (Mendukung hingga 13 digit setelah prefix)
             $no_hp = $rawNoHp;
@@ -924,7 +968,7 @@ public function exportPdf(Request $request)
 
             // Cek duplikat — semua kolom harus sama agar dianggap duplikat
             $exists = InaprocAccount::where('nama', $nama)
-                                    ->where('opd', $opd)
+                                    ->where('opd_id', $opd_id)
                                     ->where('status', $status)
                                     ->where('no_surat_permohonan', $no_surat)
                                     ->where('perihal_permohonan', $perihal)
@@ -976,7 +1020,8 @@ public function exportPdf(Request $request)
             try {
                 InaprocAccount::create([
                     'nama'               => $nama,
-                    'opd'                => $opd,
+                    'opd_id'             => $opd_id,
+                    'opd'                => $opdName,
                     'status'             => $status,
                     'no_surat_permohonan'=> $no_surat,
                     'perihal_permohonan' => $perihal,
@@ -991,6 +1036,7 @@ public function exportPdf(Request $request)
                     'sumber'             => $sumber,
                     'jenis_data'         => $jenis_data,
                     'tanggal_daftar'     => $tanggalDaftar,
+                    'is_active'          => (strtolower($statusAkun) !== 'non-aktif' && strtolower($statusAkun) !== 'tidak aktif'),
                 ]);
             } catch (\Illuminate\Database\QueryException $e) {
                 $rowLabel = !empty($nama) ? $nama : (!empty($user_id) ? $user_id : 'Baris tanpa nama');

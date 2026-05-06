@@ -35,6 +35,70 @@
                 });
             @endif
         });
+
+        function confirmLogout() {
+            Swal.fire({
+                title: 'Apakah Anda yakin?',
+                text: "Anda akan keluar dari sistem manajemen ini.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#e11d48', // rose-600
+                cancelButtonColor: '#64748b', // slate-500
+                confirmButtonText: 'Ya, Keluar!',
+                cancelButtonText: 'Batal',
+                reverseButtons: true,
+                customClass: {
+                    popup: 'rounded-2xl shadow-xl border border-gray-100',
+                    confirmButton: 'rounded-xl font-bold px-6 py-3',
+                    cancelButton: 'rounded-xl font-bold px-6 py-3'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('logout-form').submit();
+                }
+            })
+        }
+
+        // Handler untuk notifikasi export tanpa filter
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.export-link')) {
+                const urlParams = new URLSearchParams(window.location.search);
+                const hasYear = urlParams.get('tahun');
+                const hasStartMonth = urlParams.get('start_month');
+                const hasEndMonth = urlParams.get('end_month');
+
+                if (!hasYear && !hasStartMonth && !hasEndMonth) {
+                    e.preventDefault();
+                    const targetUrl = e.target.closest('.export-link').href;
+                    const isBlank = e.target.closest('.export-link').target === '_blank';
+
+                    Swal.fire({
+                        title: 'Ekspor Seluruh Data?',
+                        text: "Anda belum memilih filter Tahun atau Bulan. Sistem akan mengekspor SELURUH data dari semua tahun yang ada. Lanjutkan?",
+                        icon: 'info',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3b82f6', // blue-500
+                        cancelButtonColor: '#64748b', // slate-500
+                        confirmButtonText: 'Ya, Ekspor Semua',
+                        cancelButtonText: 'Batal',
+                        reverseButtons: true,
+                        customClass: {
+                            popup: 'rounded-2xl shadow-xl border border-gray-100',
+                            confirmButton: 'rounded-xl font-bold px-6 py-3',
+                            cancelButton: 'rounded-xl font-bold px-6 py-3'
+                        }
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            if (isBlank) {
+                                window.open(targetUrl, '_blank');
+                            } else {
+                                window.location.href = targetUrl;
+                            }
+                        }
+                    });
+                }
+            }
+        });
     </script>
 </body>
 </html>

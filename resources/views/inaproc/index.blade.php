@@ -11,32 +11,69 @@
                 <p class="text-[10px] md:text-xs text-gray-400 font-bold uppercase tracking-widest mt-1">LPSE Provinsi Nusa Tenggara Barat</p>
             </div>
         </a>
-        <div class="flex flex-wrap justify-center items-center gap-2">
+        <div class="flex flex-wrap justify-center items-center gap-3">
             {{-- Tombol Grafik --}}
-            <a href="{{ route('inaproc.grafik') }}" target="_blank" class="inline-flex items-center justify-center bg-indigo-600 hover:bg-indigo-700 text-white h-10 px-4 md:px-6 rounded-lg shadow-md shadow-indigo-100 transition-all font-bold text-xs md:text-sm">
-                <svg class="w-4 h-4 mr-1 md:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-                Grafik
+            <a href="{{ route('inaproc.grafik') }}" target="_blank" title="Lihat Grafik Statistik" class="inline-flex items-center justify-center bg-indigo-50 text-indigo-600 border border-indigo-100 w-11 h-11 rounded-xl shadow-sm hover:bg-indigo-600 hover:text-white transition-all duration-300">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
             </a>
 
-            {{-- Tombol Tambah Data Modern --}}
-            <button type="button" onclick="openCreateModal()" class="inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white h-10 px-4 md:px-6 rounded-lg shadow-md shadow-blue-100 transition-all font-bold text-xs md:text-sm">
-                <svg class="w-4 h-4 mr-1 md:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                Tambah Data
-            </button>
-            
-            {{-- Tombol Ganti Password --}}
-            <button type="button" onclick="openPasswordModal()" class="inline-flex items-center justify-center bg-amber-500 hover:bg-amber-600 text-white h-10 px-4 md:px-6 rounded-lg shadow-md shadow-amber-100 transition-all font-bold text-xs md:text-sm">
-                <svg class="w-4 h-4 mr-1 md:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-                Ganti Password
-            </button>
-            
-            {{-- Form Logout Modern --}}
-            <form method="POST" action="{{ route('logout') }}" class="m-0">
-                @csrf
-                <button type="submit" class="inline-flex items-center justify-center bg-white text-red-600 border border-red-200 h-10 px-4 md:px-6 rounded-lg text-xs md:text-sm font-bold hover:bg-red-50 transition-colors">
-                    Logout
+            @can('admin-access')
+            {{-- Dropdown Administrasi Sistem --}}
+            <div class="relative inline-block group">
+                <button type="button" title="Administrasi Sistem" class="inline-flex items-center justify-center bg-gray-50 text-gray-500 border border-gray-100 w-11 h-11 rounded-xl shadow-sm hover:bg-gray-600 hover:text-white transition-all duration-300">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                 </button>
-            </form>
+                <div class="absolute right-0 w-64 mt-2 origin-top-right bg-white border border-gray-100 divide-y divide-gray-50 rounded-2xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-[999] p-2">
+                    <div class="px-3 py-2 text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Administrasi</div>
+                    <a href="{{ route('opds.index') }}" class="flex items-center px-4 py-2.5 text-xs text-emerald-700 hover:bg-emerald-50 rounded-xl font-bold transition">
+                        <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                        Master OPD
+                    </a>
+                    <a href="{{ route('users.index') }}" class="flex items-center px-4 py-2.5 text-xs text-purple-700 hover:bg-purple-50 rounded-xl font-bold transition">
+                        <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                        Manajemen User
+                    </a>
+                </div>
+            </div>
+
+            {{-- Divider --}}
+            <div class="h-8 w-px bg-gray-100 mx-1"></div>
+
+            {{-- Tombol Tambah Data --}}
+            <button type="button" onclick="openCreateModal()" title="Tambah Akun Baru" class="inline-flex items-center justify-center bg-blue-600 text-white w-11 h-11 rounded-xl shadow-lg shadow-blue-200 hover:bg-blue-700 hover:scale-110 transition-all duration-300">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            </button>
+            @endcan
+
+            {{-- USER PROFILE DROPDOWN --}}
+            <div class="relative inline-block group">
+                <button type="button" class="flex items-center focus:outline-none">
+                    <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=3b82f6&color=fff&bold=true" class="w-11 h-11 rounded-xl border-2 border-white shadow-sm group-hover:scale-105 transition-all duration-300" alt="User">
+                </button>
+                <div class="absolute right-0 w-64 mt-2 origin-top-right bg-white border border-gray-100 divide-y divide-gray-50 rounded-2xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-[999] p-2">
+                    <div class="px-4 py-3">
+                        <p class="text-xs font-black text-blue-800 truncate">{{ Auth::user()->name }}</p>
+                        <p class="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">{{ Auth::user()->email }}</p>
+                    </div>
+                    
+                    <div class="py-1">
+                        <button type="button" onclick="openPasswordModal()" class="flex items-center w-full px-4 py-2.5 text-xs text-amber-700 hover:bg-amber-50 rounded-xl font-bold transition">
+                            <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                            Ganti Password
+                        </button>
+                    </div>
+
+                    <div class="py-1">
+                        <form id="logout-form" method="POST" action="{{ route('logout') }}" class="hidden">
+                            @csrf
+                        </form>
+                        <button type="button" onclick="confirmLogout()" class="flex items-center w-full px-4 py-2.5 text-xs text-rose-700 hover:bg-rose-50 rounded-xl font-bold transition">
+                            <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                            Keluar Sistem
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -123,69 +160,71 @@
 
     {{-- FILTER & ACTION BUTTONS SECTION --}}
     <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 py-2">
-        {{-- TOMBOL AKSI --}}
-        <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
-            {{-- Tombol Export PDF --}}
+        {{-- TOMBOL AKSI GROUPED --}}
+        <div class="flex items-center gap-3 w-full lg:w-auto">
+            {{-- Dropdown Export --}}
             <div class="relative inline-block group">
-                <button type="button" class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg text-xs font-bold flex items-center transition shadow-sm w-full justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                <button type="button" title="Export Data (PDF/Excel)" class="bg-blue-600 text-white w-12 h-10 rounded-xl shadow-md shadow-blue-100 hover:bg-blue-700 transition-all flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
-                    Export PDF
                 </button>
-                
-                <!-- Dropdown Menu -->
-                <div class="absolute left-0 w-56 mt-2 origin-top-left bg-white border border-gray-100 divide-y divide-gray-50 rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[999]">
-                    <div class="py-2">
-                        <div class="px-4 py-1 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-50 mb-1">Rekapitulasi (Grouped)</div>
-                        <a href="{{ route('inaproc.export-pdf', array_merge(request()->query(), ['jenis' => 'Katalog v.6'])) }}" target="_blank" class="flex items-center px-4 py-2 text-xs text-gray-700 hover:bg-blue-50 hover:text-blue-700 font-bold transition">
-                            📄 Rekap Katalog v.6
-                        </a>
-                        <a href="{{ route('inaproc.export-pdf', array_merge(request()->query(), ['jenis' => 'SPSE'])) }}" target="_blank" class="flex items-center px-4 py-2 text-xs text-gray-700 hover:bg-blue-50 hover:text-blue-700 font-bold transition">
-                            📄 Rekap SPSE
-                        </a>
-                    </div>
-                    <div class="py-2">
-                        <div class="px-4 py-1 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-50 mb-1">Daftar Detail (New)</div>
-                        <a href="{{ route('inaproc.export-pdf-detail', array_merge(request()->query(), ['jenis' => 'Katalog v.6'])) }}" target="_blank" class="flex items-center px-4 py-2 text-xs text-gray-700 hover:bg-amber-50 hover:text-amber-700 font-bold transition">
-                            📋 Detail Katalog v.6
-                        </a>
-                        <a href="{{ route('inaproc.export-pdf-detail', array_merge(request()->query(), ['jenis' => 'SPSE'])) }}" target="_blank" class="flex items-center px-4 py-2 text-xs text-gray-700 hover:bg-amber-50 hover:text-amber-700 font-bold transition">
-                            📋 Detail SPSE
-                        </a>
-                    </div>
+                <div class="absolute left-0 w-64 mt-2 origin-top-left bg-white border border-gray-100 divide-y divide-gray-50 rounded-2xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-[999] p-2">
+                    @can('admin-access')
+                    <div class="px-3 py-2 text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Format Excel</div>
+                    <a href="{{ route('inaproc.export-xlsx', request()->query()) }}" class="export-link flex items-center px-4 py-2.5 text-xs text-emerald-700 hover:bg-emerald-50 rounded-xl font-bold transition mb-2">
+                        📊 Export Data ke Excel (.xlsx)
+                    </a>
+                    
+                    <div class="px-3 py-2 text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 mt-2 border-t border-gray-50 pt-3">Format PDF Rekapitulasi</div>
+                    <a href="{{ route('inaproc.export-pdf', array_merge(request()->query(), ['jenis' => 'Katalog v.6'])) }}" target="_blank" class="export-link flex items-center px-4 py-2.5 text-xs text-rose-700 hover:bg-rose-50 rounded-xl font-bold transition">
+                        📄 Rekap Katalog v.6 (PDF)
+                    </a>
+                    <a href="{{ route('inaproc.export-pdf', array_merge(request()->query(), ['jenis' => 'SPSE'])) }}" target="_blank" class="export-link flex items-center px-4 py-2.5 text-xs text-rose-700 hover:bg-rose-50 rounded-xl font-bold transition">
+                        📄 Rekap SPSE (PDF)
+                    </a>
+                    @endcan
+
+                    <div class="px-3 py-2 text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 @can('admin-access') mt-2 border-t border-gray-50 pt-3 @endcan">Format PDF Detail</div>
+                    <a href="{{ route('inaproc.export-pdf-detail', array_merge(request()->query(), ['jenis' => 'Katalog v.6'])) }}" target="_blank" class="export-link flex items-center px-4 py-2.5 text-xs text-blue-700 hover:bg-blue-50 rounded-xl font-bold transition">
+                        📋 Detail Katalog v.6 (PDF)
+                    </a>
+                    <a href="{{ route('inaproc.export-pdf-detail', array_merge(request()->query(), ['jenis' => 'SPSE'])) }}" target="_blank" class="export-link flex items-center px-4 py-2.5 text-xs text-blue-700 hover:bg-blue-50 rounded-xl font-bold transition">
+                        📋 Detail SPSE (PDF)
+                    </a>
                 </div>
             </div>
 
-            {{-- TOMBOL EXPORT XLSX --}}
-            <a href="{{ route('inaproc.export-xlsx', request()->query()) }}" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-xs font-bold flex items-center transition shadow-sm w-full sm:w-auto justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                Export Excel
-            </a>
-
-            {{-- TOMBOL IMPORT XLSX/CSV --}}
-            <form action="{{ route('inaproc.import') }}" method="POST" enctype="multipart/form-data" class="flex items-center w-full sm:w-auto">
-                @csrf
-                <input type="file" name="csv_file" id="csv_file" class="hidden" onchange="this.form.submit()" accept=".xlsx,.xls,.csv">
-                <button type="button" onclick="document.getElementById('csv_file').click()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-xs font-bold flex items-center transition shadow-sm w-full justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            @can('admin-access')
+            {{-- Dropdown Import --}}
+            <div class="relative inline-block group">
+                <button type="button" title="Import Data / Template" class="bg-emerald-600 text-white w-12 h-10 rounded-xl shadow-md shadow-emerald-100 hover:bg-emerald-700 transition-all flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                     </svg>
-                    Import Excel
                 </button>
-            </form>
+                <div class="absolute left-0 w-64 mt-2 origin-top-left bg-white border border-gray-100 divide-y divide-gray-50 rounded-2xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-[999] p-2">
+                    <div class="px-3 py-2 text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Manajemen Data</div>
+                    <form action="{{ route('inaproc.import') }}" method="POST" enctype="multipart/form-data" class="m-0">
+                        @csrf
+                        <input type="file" name="csv_file" id="csv_file" class="hidden" onchange="this.form.submit()" accept=".xlsx,.xls,.csv">
+                        <button type="button" onclick="document.getElementById('csv_file').click()" class="w-full flex items-center px-4 py-2.5 text-xs text-emerald-700 hover:bg-emerald-50 rounded-xl font-bold transition text-left">
+                            📥 Unggah File (Excel/CSV)
+                        </button>
+                    </form>
+                    <a href="{{ route('inaproc.download-template') }}" class="flex items-center px-4 py-2.5 text-xs text-slate-600 hover:bg-slate-50 rounded-xl font-bold transition mt-1">
+                        📄 Download Template Impor
+                    </a>
+                </div>
+            </div>
 
-            {{-- Tombol Download Template --}}
-            <a href="{{ route('inaproc.download-template') }}" class="bg-slate-100 hover:bg-slate-200 text-slate-600 px-4 py-2 rounded-lg text-xs font-bold flex items-center transition border border-slate-200 w-full sm:w-auto justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                </svg>
-                Download Template
-            </a>
+            {{-- Divider --}}
+            <div class="h-6 w-px bg-gray-200 mx-1 lg:block hidden"></div>
+            @endcan
         </div>
 
         {{-- FILTER FORM --}}
-        <form id="auto-filter-form" action="{{ route('inaproc-accounts.index') }}" method="GET" class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
+        <form id="auto-filter-form" action="{{ route('inaproc-accounts.index') }}" method="GET" class="flex flex-wrap items-center gap-2 w-full lg:w-auto lg:ml-auto justify-end">
             <div class="flex flex-wrap items-center gap-1 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-200">
                 <span class="text-[10px] font-black text-gray-400 uppercase mr-1 w-full sm:w-auto">Rentang:</span>
                 <div class="flex items-center gap-1">
@@ -208,8 +247,8 @@
             <div class="flex items-center bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-200">
                 <select name="tahun" onchange="this.form.submit()" class="bg-transparent border-none text-xs font-bold text-gray-600 focus:ring-0 cursor-pointer p-0">
                     <option value="">Semua Tahun</option>
-                    @for($y = date('Y'); $y >= date('Y') - 1; $y--)
-                        <option value="{{ $y }}" {{ request('tahun') == $y ? 'selected' : '' }}>{{ $y }}</option>
+                    @for($y = date('Y') + 1; $y >= 2024; $y--)
+                        <option value="{{ $y }}" {{ request('tahun', date('Y')) == $y ? 'selected' : '' }}>{{ $y }}</option>
                     @endfor
                 </select>
             </div>
@@ -223,8 +262,23 @@
                 </select>
             </div>
 
+            <div class="flex items-center bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-100">
+                <select name="opd_filter" onchange="this.form.submit()" class="bg-transparent border-none text-xs font-black text-emerald-700 focus:ring-0 cursor-pointer p-0 uppercase max-w-[150px]">
+                    <option value="">Semua OPD</option>
+                    @foreach($opds as $o)
+                        <option value="{{$o->id}}" {{ request('opd_filter') == $o->id ? 'selected' : '' }}>{{$o->nama}}</option>
+                    @endforeach
+                </select>
+            </div>
+
             <input type="hidden" name="search" value="{{ request('search') }}">
             <input type="hidden" name="per_page" value="{{ request('per_page', 10) }}">
+
+            @if(request()->anyFilled(['start_month', 'end_month', 'tahun', 'status_filter', 'opd_filter', 'search', 'jenis_filter']))
+            <a href="{{ route('inaproc-accounts.index') }}" title="Hapus Semua Filter" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 text-gray-500 hover:bg-rose-500 hover:text-white transition-all duration-300">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            </a>
+            @endif
         </form>
     </div>
 
@@ -264,24 +318,30 @@
             <table class="w-full text-left min-w-[800px]">
                 <thead>
                     <tr class="bg-gray-50/50 text-gray-400 uppercase text-[10px] font-black tracking-widest border-b border-gray-100">
+                        @can('admin-access')
                         <th class="p-4 text-center w-10">
                             <input type="checkbox" id="select-all-checkbox" class="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer" title="Pilih Semua">
                         </th>
+                        @endcan
                         <th class="p-4 text-center">No</th>
                         <th class="p-4">Nama Lengkap</th>
                         <th class="p-4">Satuan Kerja</th>
                         <th class="p-4">Status</th>
                         <th class="p-4">SK & User ID</th>
                         <th class="p-4">Kontak</th>
+                        @can('admin-access')
                         <th class="p-4 text-center">Aksi</th>
+                        @endcan
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-50">
                     @foreach($accounts as $index => $item)
                     <tr class="hover:bg-blue-50/30 transition-colors bulk-row {{ !$item->is_active ? 'bg-red-50/80' : '' }}">
+                        @can('admin-access')
                         <td class="p-4 text-center">
                             <input type="checkbox" class="row-checkbox w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer" value="{{ $item->id }}">
                         </td>
+                        @endcan
                         <td class="p-4 text-center text-xs font-bold text-gray-400">{{ $index + 1 }}</td>
                         <td class="p-4">
                             <div class="flex flex-col">
@@ -290,7 +350,7 @@
                                 <span class="text-[9px] text-gray-400 mt-1 font-medium">Terdaftar: {{ \Carbon\Carbon::parse($item->tanggal_daftar)->format('d M Y') }}</span>
                             </div>
                         </td>
-                        <td class="p-4 text-xs font-bold text-gray-600">{{ $item->opd }}</td>
+                        <td class="p-4 text-xs font-bold text-gray-600">{{ $item->opd_detail->nama ?? '-' }}</td>
                         <td class="p-4">
                             <div class="flex flex-col items-start gap-1">
                                 <span class="inline-block px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 text-[10px] font-black uppercase">{{ $item->status }}</span>
@@ -318,6 +378,7 @@
                                 {{ $cleanPhone }}
                             </a>
                         </td>
+                        @can('admin-access')
                         <td class="p-4">
                             <div class="flex justify-center space-x-2">
                                 <button type="button" onclick="openEditModal({{ $item->id }})" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-amber-100 text-amber-600 hover:bg-amber-600 hover:text-white transition-all">
@@ -329,6 +390,7 @@
                                 </button>
                             </div>
                         </td>
+                        @endcan
                     </tr>
                     @endforeach
                 </tbody>

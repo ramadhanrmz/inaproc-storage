@@ -24,5 +24,9 @@ class AppServiceProvider extends ServiceProvider
         if (config('app.env') !== 'local' && !request()->is('127.0.0.1*') && !request()->is('localhost*')) {
             URL::forceScheme('https');
         }
+
+        \Illuminate\Support\Facades\Gate::define('admin-access', function ($user) {
+            return $user->isAdmin();
+        });
     }
 }

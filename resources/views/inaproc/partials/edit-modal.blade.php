@@ -34,48 +34,12 @@
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-600 uppercase tracking-widest mb-1.5">Perangkat Daerah (OPD) <span class="text-red-500">*</span></label>
-                        <input list="edit_list_opd" name="opd" id="edit-opd" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 bg-gray-50 focus:bg-white text-sm transition-all focus:ring-2 focus:ring-amber-400" required>
-                        <datalist id="edit_list_opd">
-                            <option value="Badan Kesatuan Bangsa dan Politik Dalam Negeri">
-                            <option value="Badan Kepegawaian Daerah">
-                            <option value="Badan Keuangan dan Aset Daerah">
-                            <option value="Badan Penanggulangan Bencana Daerah">
-                            <option value="Badan Pendapatan Daerah">
-                            <option value="Badan Pengembangan Sumber Daya Manusia Daerah">
-                            <option value="Badan Penghubung Daerah">
-                            <option value="Badan Perencanaan Pembangunan Daerah">
-                            <option value="Badan Riset dan Inovasi Daerah">
-                            <option value="Biro Hukum dan Hak Asasi Manusia">
-                            <option value="Biro Kesejahteraan Rakyat">
-                            <option value="Biro Organisasi">
-                            <option value="Biro Pemerintahan dan Otonomi Daerah">
-                            <option value="Biro Perekonomian dan Administrasi Pembangunan">
-                            <option value="Biro Pengadaan Barang dan Jasa">
-                            <option value="Biro Umum dan Administrasi Pimpinan">
-                            <option value="Dinas Energi dan Sumber Daya Mineral">
-                            <option value="Dinas Kebudayaan">
-                            <option value="Dinas Kelautan dan Perikanan">
-                            <option value="Dinas Kesehatan">
-                            <option value="Rumah Sakit Umum Daerah Provinsi NTB">
-                            <option value="Dinas Komunikasi, Informatika dan Statistik">
-                            <option value="Dinas Koperasi Usaha Kecil dan Menengah">
-                            <option value="Dinas Lingkungan Hidup dan Kehutanan">
-                            <option value="Dinas Pariwisata dan Ekonomi Kreatif">
-                            <option value="Dinas Penanaman Modal dan Pelayanan Terpadu Satu Pintu">
-                            <option value="Dinas Pekerjaan Umum, Penataan Ruang, Perumahan dan Kawasan Permukiman">
-                            <option value="Dinas Pendidikan, Pemuda dan Olahraga">
-                            <option value="Dinas Pemberdayaan Masyarakat, Pemerintahan Desa, Kependudukan dan Catatan Sipil">
-                            <option value="Dinas Perhubungan">
-                            <option value="Dinas Perindustrian dan Perdagangan">
-                            <option value="Dinas Perpustakaan dan Kearsipan">
-                            <option value="Dinas Pertanian dan Ketahanan Pangan">
-                            <option value="Dinas Peternakan dan Kesehatan Hewan">
-                            <option value="Dinas Sosial, Pemberdayaan Perempuan dan Perlindungan Anak">
-                            <option value="Dinas Tenaga Kerja dan Transmigrasi">
-                            <option value="Inspektorat">
-                            <option value="Satuan Polisi Pamong Praja">
-                            <option value="Sekretariat Dewan Perwakilan Rakyat Daerah">
-                        </datalist>
+                        <select name="opd_id" id="edit-opd_id" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 bg-gray-50 focus:bg-white text-sm transition-all focus:ring-2 focus:ring-amber-400 font-bold" required>
+                            <option value="">-- Pilih OPD --</option>
+                            @foreach($opds as $opd)
+                                <option value="{{ $opd->id }}">{{ $opd->nama }}</option>
+                            @endforeach
+                        </select>
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-600 uppercase tracking-widest mb-1.5">Status <span class="text-red-500">*</span></label>
@@ -232,7 +196,7 @@ function openEditModal(id) {
     .then(data => {
         // Populate fields
         document.getElementById('edit-nama').value = data.nama || '';
-        document.getElementById('edit-opd').value = data.opd || '';
+        document.getElementById('edit-opd_id').value = data.opd_id || '';
         document.getElementById('edit-status').value = data.status || '';
         document.getElementById('edit-user_id').value = data.user_id || '';
         document.getElementById('edit-nik').value = data.nik || '';
