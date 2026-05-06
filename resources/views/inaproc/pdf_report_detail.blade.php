@@ -37,20 +37,22 @@
                 <th style="width: 30px; text-align: center;">No</th>
                 <th style="text-align: center;">Satuan Kerja</th>
                 <th style="text-align: center;">Nama Lengkap</th>
-                <th style="width: 100px; text-align: center;">Status</th>
+                <th style="width: 110px; text-align: center;">Jabatan</th>
+                <th style="width: 80px; text-align: center;">Status</th>
             </tr>
         </thead>
         <tbody>
             @forelse($data as $index => $item)
-                <tr>
+                <tr style="{{ !$item->is_active ? 'color: red;' : '' }}">
                     <td class="text-center">{{ $index + 1 }}</td>
                     <td>{{ $item->opd }}</td>
                     <td>{{ $item->nama }}</td>
+                    <td>{{ $item->jabatan }}</td>
                     <td class="text-center">{{ $item->status }}</td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="4" class="text-center" style="padding: 20px;">
+                    <td colspan="5" class="text-center" style="padding: 20px;">
                         Tidak ada data ditemukan untuk kriteria filter ini.
                     </td>
                 </tr>

@@ -55,9 +55,9 @@
             
             @forelse($data as $opd => $accounts)
                 @php
-                    $countPPK = $accounts->where('status', 'PPK')->count();
-                    $countPP = $accounts->where('status', 'PP')->count();
-                    $countBendahara = $accounts->where('status', 'Bendahara')->count();
+                    $countPPK = $accounts->where('status', 'PPK')->where('is_active', true)->count();
+                    $countPP = $accounts->where('status', 'PP')->where('is_active', true)->count();
+                    $countBendahara = $accounts->where('status', 'Bendahara')->where('is_active', true)->count();
                     
                     // Logika: Hanya tampilkan jika setidaknya ada 1 akun di kategori yang ditampilkan
                     if ($jenis == 'SPSE') {

@@ -12,6 +12,6 @@ class InaprocAccount extends Model
     protected $fillable = [
         'nama', 'opd', 'status', 'no_surat_permohonan', 'perihal_permohonan',
         'no_sk', 'user_id', 'nik', 'nip', 'pangkat_gol', 'jabatan',
-        'no_hp', 'alamat', 'sumber', 'jenis_data', 'tanggal_daftar'
+        'no_hp', 'alamat', 'sumber', 'jenis_data', 'tanggal_daftar', 'is_active'
     ];
 }

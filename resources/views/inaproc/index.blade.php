@@ -278,15 +278,15 @@
                 </thead>
                 <tbody class="divide-y divide-gray-50">
                     @foreach($accounts as $index => $item)
-                    <tr class="hover:bg-blue-50/30 transition-colors bulk-row">
+                    <tr class="hover:bg-blue-50/30 transition-colors bulk-row {{ !$item->is_active ? 'bg-red-50/80' : '' }}">
                         <td class="p-4 text-center">
                             <input type="checkbox" class="row-checkbox w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer" value="{{ $item->id }}">
                         </td>
                         <td class="p-4 text-center text-xs font-bold text-gray-400">{{ $index + 1 }}</td>
                         <td class="p-4">
                             <div class="flex flex-col">
-                                <span class="font-bold text-gray-700 text-sm">{{ $item->nama }}</span>
-                                <span class="text-[10px] text-blue-500 font-bold italic">{{ $item->jabatan }}</span>
+                                <span class="font-bold {{ !$item->is_active ? 'text-red-700' : 'text-gray-700' }} text-sm">{{ $item->nama }}</span>
+                                <span class="text-[10px] {{ !$item->is_active ? 'text-red-500' : 'text-blue-500' }} font-bold italic">{{ $item->jabatan }}</span>
                                 <span class="text-[9px] text-gray-400 mt-1 font-medium">Terdaftar: {{ \Carbon\Carbon::parse($item->tanggal_daftar)->format('d M Y') }}</span>
                             </div>
                         </td>
@@ -295,6 +295,9 @@
                             <div class="flex flex-col items-start gap-1">
                                 <span class="inline-block px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 text-[10px] font-black uppercase">{{ $item->status }}</span>
                                 <span class="inline-block px-2 py-0.5 rounded-md {{ $item->jenis_data == 'SPSE' ? 'bg-purple-50 text-purple-600' : 'bg-orange-50 text-orange-600' }} text-[9px] font-bold">{{ $item->jenis_data }}</span>
+                                @if(!$item->is_active)
+                                    <span class="inline-block px-2 py-0.5 rounded-md bg-red-600 text-white text-[9px] font-black uppercase animate-pulse">Non-Aktif</span>
+                                @endif
                             </div>
                         </td>
                         <td class="p-4">

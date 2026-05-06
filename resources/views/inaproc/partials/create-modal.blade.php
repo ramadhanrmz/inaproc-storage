@@ -138,7 +138,6 @@
                     </div>
                 </div>
 
-                {{-- Radio Groups --}}
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-bold text-gray-600 uppercase tracking-widest mb-2">Sumber Data <span class="text-red-500">*</span></label>
@@ -154,6 +153,20 @@
                             <label class="inline-flex items-center"><input type="radio" name="jenis_data" value="SPSE" class="form-radio text-blue-500" required><span class="ml-2 text-sm">SPSE</span></label>
                         </div>
                     </div>
+                </div>
+
+                <div class="mt-2 p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                    <label class="inline-flex items-center cursor-pointer group">
+                        <div class="relative flex items-center">
+                            <input type="checkbox" name="is_active" id="create-is_active" value="1" class="peer h-6 w-6 rounded-lg border-2 border-gray-300 text-blue-600 focus:ring-blue-500 transition-all cursor-pointer" checked>
+                            <div class="absolute inset-0 bg-blue-500 rounded-lg scale-0 peer-checked:scale-100 transition-transform duration-200"></div>
+                            <svg class="absolute inset-0 w-6 h-6 text-white scale-0 peer-checked:scale-100 transition-transform duration-200 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                        </div>
+                        <div class="ml-4">
+                            <span class="block text-sm font-black text-gray-700 uppercase tracking-tight group-hover:text-blue-600 transition-colors">Status Akun Aktif</span>
+                            <span class="block text-[10px] text-gray-400 font-bold uppercase mt-0.5">Biarkan tercentang untuk akun baru. Akun non-aktif akan ditandai warna merah di laporan.</span>
+                        </div>
+                    </label>
                 </div>
 
                 <div>

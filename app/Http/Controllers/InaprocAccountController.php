@@ -72,6 +72,9 @@ class InaprocAccountController extends Controller
         // Filter Jenis Data (Jika ada)
         if ($jenisFilter) $baseDetail->where('jenis_data', $jenisFilter);
 
+        // Hanya hitung akun yang aktif untuk statistik dashboard
+        $baseDetail->where('is_active', true);
+
         $stats = [
             // Total utama (Sama dengan baseDetail karena filternya sudah lengkap)
             'total' => (clone $baseDetail)->count(),
@@ -254,6 +257,7 @@ class InaprocAccountController extends Controller
             'sumber' => 'required',
             'jenis_data' => 'required|in:Katalog v.6,SPSE',
             'tanggal_daftar' => 'required|date',
+            'is_active' => 'sometimes|boolean',
         ], [
             'nama.required' => 'Nama Lengkap wajib diisi.',
             'opd.required' => 'Perangkat Daerah (OPD) wajib diisi.',
@@ -285,6 +289,7 @@ class InaprocAccountController extends Controller
         if (str_starts_with($no_hp, '62')) $no_hp = substr($no_hp, 2);
         if (str_starts_with($no_hp, '0')) $no_hp = substr($no_hp, 1);
         $validated['no_hp'] = '62' . substr($no_hp, 0, 13);
+        $validated['is_active'] = $request->boolean('is_active', true);
 
         InaprocAccount::create($validated);
 
@@ -329,6 +334,7 @@ class InaprocAccountController extends Controller
             'alamat' => 'required',
             'sumber' => 'required',
             'jenis_data' => 'required',
+            'is_active' => 'sometimes|boolean',
         ], [
             'user_id.unique' => 'User ID ini sudah pernah didaftarkan.',
         ]);
@@ -338,6 +344,7 @@ class InaprocAccountController extends Controller
         if (str_starts_with($no_hp, '62')) $no_hp = substr($no_hp, 2);
         if (str_starts_with($no_hp, '0')) $no_hp = substr($no_hp, 1);
         $validated['no_hp'] = '62' . substr($no_hp, 0, 13);
+        $validated['is_active'] = $request->boolean('is_active');
 
         $inaprocAccount->update($validated);
 
